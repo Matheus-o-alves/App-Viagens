@@ -1,0 +1,1 @@
+export 'payments_dependency_injector.dart';
