@@ -14,16 +14,14 @@ class ExpenseCard extends StatelessWidget {
     final isReimbursed = expense.isReimbursed;
     final isReimbursable = expense.reimbursable;
     
-    // Status colors
     final Color statusColor = isReimbursed
-        ? const Color(0xFF4CAF50)  // Green for reimbursed
+        ? const Color(0xFF4CAF50) 
         : expense.status == 'pending_approval'
-            ? const Color(0xFFFFA000)  // Amber for pending
+            ? const Color(0xFFFFA000)  
             : expense.status == 'past_due'
-                ? const Color(0xFFF44336)  // Red for past due
-                : const Color(0xFF1A73E8); // Blue for scheduled
+                ? const Color(0xFFF44336)  
+                : const Color(0xFF1A73E8); 
 
-    // Status text
     final String statusText = isReimbursed
         ? 'Reimbursed'
         : expense.status == 'pending_approval'
@@ -32,10 +30,8 @@ class ExpenseCard extends StatelessWidget {
                 ? 'Past Due'
                 : 'Scheduled';
             
-    // Payment method icon
     final IconData paymentMethodIcon = _getPaymentMethodIcon(expense.paymentMethod);
     
-    // Category icon
     final IconData categoryIcon = _getCategoryIcon(expense.category);
     
     return Card(
@@ -46,7 +42,6 @@ class ExpenseCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Header with destination-like styling
           Container(
             decoration: BoxDecoration(
               color: const Color(0xFF1A73E8),
