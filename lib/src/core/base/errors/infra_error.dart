@@ -1,13 +1,12 @@
-import 'package:equatable/equatable.dart';
+class ServerException implements Exception {
+  final String message;
+  final int statusCode;
 
-enum InfraCode { unexpected }
+  const ServerException({required this.message, required this.statusCode});
+}
 
-class InfraError extends Equatable {
-  final InfraCode code;
-  final dynamic error;
+class ConnectionException implements Exception {
+  final String message;
 
-  const InfraError(this.code, {this.error});
-
-  @override
-  List<Object?> get props => [code, error];
+  const ConnectionException({required this.message});
 }

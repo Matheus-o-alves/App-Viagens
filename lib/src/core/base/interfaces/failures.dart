@@ -1,18 +1,22 @@
-import 'package:base_project/src/core/base/constants/app_constants.dart';
-import 'package:equatable/equatable.dart';
-
-abstract class Failure extends Equatable {
+abstract class Failure {
   final String message;
-  final String? errorDetail;
-  final dynamic error;
+  
+  const Failure({required this.message});
+}
 
-  const Failure({required this.message, this.errorDetail, this.error});
+class ServerFailure extends Failure {
+  final int statusCode;
+  
+  const ServerFailure({required super.message, required this.statusCode});
+}
 
-  @override
-  List<Object?> get props => [message, error, errorDetail];
+class ConnectionFailure extends Failure {
+  const ConnectionFailure({required super.message});
 }
 
 class GenericFailure extends Failure {
-  GenericFailure({String? message, super.errorDetail, super.error})
-    : super(message: message ?? AppConstants.genericError001);
+  final Object error;
+  
+   GenericFailure({required this.error}) 
+    : super(message: error.toString());
 }

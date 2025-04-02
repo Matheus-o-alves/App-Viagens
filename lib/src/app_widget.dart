@@ -13,7 +13,7 @@ class AppWidget extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.payments,
-      routes: AppRoutes.routes,
+      // routes: AppRoutes.routes,
     );
   }
 }
