@@ -1,4 +1,4 @@
-// States
+// presentation/bloc/travelExpensesBloc/travel_expenses_state.dart
 import 'package:equatable/equatable.dart';
 import '../../../domain/domain.dart';
 
@@ -22,6 +22,28 @@ class TravelExpensesLoaded extends TravelExpensesState {
   List<Object?> get props => [expenses];
 }
 
+class TravelExpenseDetailsLoaded extends TravelExpensesState {
+  final TravelExpenseEntity expense;
+
+  const TravelExpenseDetailsLoaded(this.expense);
+
+  @override
+  List<Object?> get props => [expense];
+}
+
+class TravelExpenseActionSuccess extends TravelExpensesState {
+  final String message;
+  final TravelExpensesActionType actionType;
+
+  const TravelExpenseActionSuccess({
+    required this.message,
+    required this.actionType,
+  });
+
+  @override
+  List<Object?> get props => [message, actionType];
+}
+
 class TravelExpensesError extends TravelExpensesState {
   final String message;
 
@@ -30,3 +52,5 @@ class TravelExpensesError extends TravelExpensesState {
   @override
   List<Object?> get props => [message];
 }
+
+enum TravelExpensesActionType { add, update, delete }

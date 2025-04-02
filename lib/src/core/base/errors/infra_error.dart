@@ -10,3 +10,10 @@ class ConnectionException implements Exception {
 
   const ConnectionException({required this.message});
 }
+
+
+class DatabaseException implements Exception {
+  final String message;
+
+  const DatabaseException({required this.message});
+}

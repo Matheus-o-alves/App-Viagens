@@ -20,3 +20,7 @@ class GenericFailure extends Failure {
    GenericFailure({required this.error}) 
     : super(message: error.toString());
 }
+
+class DatabaseFailure extends Failure {
+  const DatabaseFailure({required super.message});
+}

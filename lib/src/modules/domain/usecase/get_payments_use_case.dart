@@ -13,14 +13,14 @@ class GetTravelExpensesUseCase implements UseCase<List<TravelExpenseEntity>, NoP
     final result = await _repository.getTravelExpenses();
 
     if (result.isRight()) {
-      final expenses = result.asRight();
+      final expenses = result.getOrElse(() => []);
       
-      // Ordenar por data, sem filtrar
-      expenses.sort((a, b) => a.expenseDate.compareTo(b.expenseDate));
+      // Ordenar por data
+      expenses.sort((a, b) => b.expenseDate.compareTo(a.expenseDate)); // Data mais recente primeiro
 
       return Right(expenses);
     } else {
-      return result.map((_) => <TravelExpenseEntity>[]);
+      return result;
     }
   }
 }
