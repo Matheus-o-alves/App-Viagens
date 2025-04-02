@@ -1,32 +1,47 @@
-// data/models/travel_expenses_info_model.dart
-import '../../../domain/domain.dart';
-import '../../data.dart';
+
+import '../../../../exports.dart';
+import 'travel_card_model.dart';
 
 class TravelExpensesInfoModel extends TravelExpensesInfoEntity {
   const TravelExpensesInfoModel({
-    required List<TravelExpenseEntity> travelExpenses,
-  }) : super(travelExpenses: travelExpenses);
+    required List<TravelExpenseModel> despesasdeviagem,
+    required List<TravelCardModel> cartoes,
+  }) : super(
+    despesasdeviagem: despesasdeviagem,
+    cartoes: cartoes,
+  );
 
   factory TravelExpensesInfoModel.fromJson(Map<String, dynamic> json) {
+    final List<TravelExpenseModel> expenses = (json['despesasdeviagem'] as List?)
+      ?.map((expenseJson) => TravelExpenseModel.fromJson(expenseJson))
+      .toList() ?? [];
+    
+    final List<TravelCardModel> cards = (json['cartoes'] as List?)
+      ?.map((cardJson) => TravelCardModel.fromJson(cardJson))
+      .toList() ?? [];
+    
     return TravelExpensesInfoModel(
-      travelExpenses: json['travelExpenses'] != null
-          ? (json['travelExpenses'] as List)
-              .map<TravelExpenseEntity>((item) => TravelExpenseModel.fromJson(item))
-              .toList()
-          : [],
+      despesasdeviagem: expenses,
+      cartoes: cards,
     );
   }
 
-  factory TravelExpensesInfoModel.empty() => const TravelExpensesInfoModel(travelExpenses: []);
+  // Para compatibilidade com código legado
+  factory TravelExpensesInfoModel.onlyExpenses(List<TravelExpenseModel> expenses) {
+    return TravelExpensesInfoModel(
+      despesasdeviagem: expenses,
+      cartoes: [],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
-      'travelExpenses': travelExpenses.map((expense) {
-        if (expense is TravelExpenseModel) {
-          return expense.toJson();
-        }
-        return {};
-      }).toList(),
+      'despesasdeviagem': (despesasdeviagem as List<TravelExpenseModel>)
+          .map((expense) => expense.toJson())
+          .toList(),
+      'cartoes': (cartoes as List<TravelCardModel>)
+          .map((card) => card.toJson())
+          .toList(),
     };
   }
 }

@@ -1,39 +1,37 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../domain/domain.dart';
 
 class ExpenseCard extends StatelessWidget {
   final TravelExpenseEntity expense;
-  final currencyFormatter = NumberFormat.currency(locale: 'en_US', symbol: '\$');
+  final currencyFormatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
   ExpenseCard({Key? key, required this.expense}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final isReimbursed = expense.isReimbursed;
-    final isReimbursable = expense.reimbursable;
+    final isReembolsado = expense.isReimbursed;
+    final isReembolsavel = expense.reimbursable;
     
-    final Color statusColor = isReimbursed
-        ? const Color(0xFF4CAF50) 
+    final Color statusColor = isReembolsado
+        ? const Color(0xFF4CAF50)
         : expense.status == 'pending_approval'
-            ? const Color(0xFFFFA000)  
+            ? const Color(0xFFFFA000)
             : expense.status == 'past_due'
-                ? const Color(0xFFF44336)  
-                : const Color(0xFF1A73E8); 
+                ? const Color(0xFFF44336)
+                : const Color(0xFF1A73E8);
 
-    final String statusText = isReimbursed
-        ? 'Reimbursed'
+    final String statusText = isReembolsado
+        ? 'Reembolsado'
         : expense.status == 'pending_approval'
-            ? 'Pending Approval'
+            ? 'Aguardando Aprovação'
             : expense.status == 'past_due'
-                ? 'Past Due'
-                : 'Scheduled';
-            
+                ? 'Vencido'
+                : 'Agendado';
+
     final IconData paymentMethodIcon = _getPaymentMethodIcon(expense.paymentMethod);
-    
     final IconData categoryIcon = _getCategoryIcon(expense.category);
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -53,10 +51,7 @@ class ExpenseCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(
-                  categoryIcon,
-                  color: Colors.white,
-                ),
+                Icon(categoryIcon, color: Colors.white),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -85,81 +80,60 @@ class ExpenseCard extends StatelessWidget {
               ],
             ),
           ),
-          
-          // Content
+
+          // Conteúdo
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Date row
+                // Data
                 Row(
                   children: [
-                    const Icon(
-                      Icons.calendar_today,
-                      color: Color(0xFF757575),
-                      size: 20,
-                    ),
+                    const Icon(Icons.calendar_today, color: Color(0xFF757575), size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Expense Date: ${expense.expenseDateFormatted}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
+                        'Data da Despesa: ${expense.expenseDateFormatted}',
+                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
                       ),
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
-                // Category row
+
+                // Categoria
                 Row(
                   children: [
-                    Icon(
-                      categoryIcon,
-                      color: const Color(0xFF757575),
-                      size: 20,
-                    ),
+                    Icon(categoryIcon, color: const Color(0xFF757575), size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Category: ${expense.category}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                        ),
+                        'Categoria: ${expense.category}',
+                        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
                       ),
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 12),
-                
-                // Expense amount
+
+                // Valor
                 Row(
                   children: [
-                    const Icon(
-                      Icons.account_balance_wallet,
-                      color: Color(0xFF757575),
-                      size: 20,
-                    ),
+                    const Icon(Icons.account_balance_wallet, color: Color(0xFF757575), size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Total Amount: ${currencyFormatter.format(expense.amount)}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                        'Valor Total: ${currencyFormatter.format(expense.amount)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                       ),
                     ),
                   ],
                 ),
-                
-                // Reimbursement info
-                if (expense.reimbursable && !expense.isReimbursed) ...[
+
+                // Info de Reembolso
+                if (isReembolsavel && !isReembolsado) ...[
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.all(8),
@@ -169,44 +143,31 @@ class ExpenseCard extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.info_outline,
-                          color: Colors.blue,
-                          size: 16,
-                        ),
+                        const Icon(Icons.info_outline, color: Colors.blue, size: 16),
                         const SizedBox(width: 8),
                         const Expanded(
                           child: Text(
-                            'This expense is eligible for reimbursement',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 12,
-                            ),
+                            'Esta despesa é elegível para reembolso',
+                            style: TextStyle(color: Colors.blue, fontSize: 12),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ],
-                
-                // Payment method
+
+                // Método de Pagamento
                 const Divider(),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
                     children: [
-                      Icon(
-                        paymentMethodIcon,
-                        color: const Color(0xFF757575),
-                        size: 20,
-                      ),
+                      Icon(paymentMethodIcon, color: const Color(0xFF757575), size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Payment Method: ${expense.paymentMethod}',
-                          style: const TextStyle(
-                            color: Color(0xFF757575),
-                          ),
+                          'Forma de Pagamento: ${expense.paymentMethod}',
+                          style: const TextStyle(color: Color(0xFF757575)),
                         ),
                       ),
                     ],
@@ -215,9 +176,9 @@ class ExpenseCard extends StatelessWidget {
               ],
             ),
           ),
-          
-          // Action buttons
-          if (!expense.isReimbursed && expense.reimbursable)
+
+          // Botões
+          if (!isReembolsado && isReembolsavel)
             Container(
               decoration: const BoxDecoration(
                 color: Color(0xFFF5F5F5),
@@ -232,9 +193,9 @@ class ExpenseCard extends StatelessWidget {
                 children: [
                   TextButton(
                     onPressed: () {
-                      // Implement view details functionality
+                      // Ver detalhes
                     },
-                    child: const Text('View Details'),
+                    child: const Text('Ver Detalhes'),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
@@ -243,9 +204,9 @@ class ExpenseCard extends StatelessWidget {
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () {
-                      // Implement request reimbursement functionality
+                      // Solicitar reembolso
                     },
-                    child: const Text('Request Reimbursement'),
+                    child: const Text('Solicitar Reembolso'),
                   ),
                 ],
               ),
@@ -254,7 +215,7 @@ class ExpenseCard extends StatelessWidget {
       ),
     );
   }
-  
+
   IconData _getPaymentMethodIcon(String paymentMethod) {
     switch (paymentMethod.toLowerCase()) {
       case 'cartão corporativo':
@@ -267,7 +228,7 @@ class ExpenseCard extends StatelessWidget {
         return Icons.payment;
     }
   }
-  
+
   IconData _getCategoryIcon(String category) {
     switch (category.toLowerCase()) {
       case 'transporte':

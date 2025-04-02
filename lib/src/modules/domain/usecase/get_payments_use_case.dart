@@ -1,4 +1,3 @@
-// domain/usecases/get_travel_expenses_use_case.dart
 import 'package:dartz/dartz.dart';
 import '../../../core/core.dart';
 import '../domain.dart';
@@ -15,8 +14,7 @@ class GetTravelExpensesUseCase implements UseCase<List<TravelExpenseEntity>, NoP
     if (result.isRight()) {
       final expenses = result.getOrElse(() => []);
       
-      // Ordenar por data
-      expenses.sort((a, b) => b.expenseDate.compareTo(a.expenseDate)); // Data mais recente primeiro
+      expenses.sort((a, b) => b.expenseDate.compareTo(a.expenseDate)); 
 
       return Right(expenses);
     } else {

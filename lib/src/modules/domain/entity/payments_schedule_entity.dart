@@ -1,14 +1,13 @@
-// domain/entities/travel_expense_entity.dart
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
 abstract class TravelExpenseEntity extends Equatable {
   final int id;
   final DateTime expenseDate;
-  final String expenseDateFormatted;
   final String description;
-  final String category;
-  final double amount;
-  final bool reimbursable;
+  final String categoria;
+  final double quantidade;
+  final bool reembolsavel;
   final bool isReimbursed;
   final String status;
   final String paymentMethod;
@@ -16,25 +15,31 @@ abstract class TravelExpenseEntity extends Equatable {
   const TravelExpenseEntity({
     required this.id,
     required this.expenseDate,
-    required this.expenseDateFormatted,
     required this.description,
-    required this.category,
-    required this.amount,
-    required this.reimbursable,
+    required this.categoria,
+    required this.quantidade,
+    required this.reembolsavel,
     required this.isReimbursed,
     required this.status,
     required this.paymentMethod,
   });
 
+  String get expenseDateFormatted => DateFormat('dd/MM/yyyy').format(expenseDate);
+  
+  double get amount => quantidade;
+  
+  String get category => categoria;
+  
+  bool get reimbursable => reembolsavel;
+
   @override
   List<Object?> get props => [
     id,
     expenseDate,
-    expenseDateFormatted,
     description,
-    category,
-    amount,
-    reimbursable,
+    categoria,
+    quantidade,
+    reembolsavel,
     isReimbursed,
     status,
     paymentMethod,

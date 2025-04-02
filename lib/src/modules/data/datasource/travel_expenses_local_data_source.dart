@@ -1,30 +1,39 @@
-// data/datasources/travel_expenses_local_data_source.dart
-import 'package:sqflite/sqlite_api.dart';
-
-import '../../../core/core.dart';
-
+// travel_expenses_local_data_source.dart
 import '../../domain/domain.dart';
 import '../../infra/database/database_helper.dart';
 import '../../infra/datasource/travel_expenses_data_source.dart';
+import '../../infra/datasource/travel_expenses_local_data_source.dart' show TravelExpensesLocalDataSource;
 import '../data.dart';
 
+import '../model/travels/travel_card_model.dart';
 
-class TravelExpensesLocalDataSource implements TravelExpensesDataSource {
+import '../../infra/database/database_helper.dart';
+import '../../infra/datasource/travel_expenses_data_source.dart';
+
+
+
+
+class TravelExpensesLocalDataSourceImpl implements TravelExpensesLocalDataSource {
   final DatabaseHelper _databaseHelper;
 
-  TravelExpensesLocalDataSource({required DatabaseHelper databaseHelper}) 
+  TravelExpensesLocalDataSourceImpl({required DatabaseHelper databaseHelper}) 
       : _databaseHelper = databaseHelper;
 
   @override
   Future<TravelExpensesInfoEntity> getTravelExpensesInfo() async {
     try {
       final expenses = await _databaseHelper.getAllTravelExpenses();
-      return TravelExpensesInfoModel(travelExpenses: expenses);
+      final cards = await _databaseHelper.getAllTravelCards();
+      return TravelExpensesInfoModel(
+        despesasdeviagem: expenses,
+        cartoes: cards,
+      );
     } catch (e) {
-      throw DatabaseException(message: 'Failed to get expenses from database: $e');
+      throw DatabaseException(message: 'Failed to get travel info from database: $e');
     }
   }
 
+  @override
   Future<int> saveTravelExpense(TravelExpenseModel expense) async {
     try {
       if (expense.id != 0) {
@@ -37,6 +46,7 @@ class TravelExpensesLocalDataSource implements TravelExpensesDataSource {
     }
   }
 
+  @override
   Future<int> deleteTravelExpense(int id) async {
     try {
       return await _databaseHelper.deleteTravelExpense(id);
@@ -45,6 +55,7 @@ class TravelExpensesLocalDataSource implements TravelExpensesDataSource {
     }
   }
 
+  @override
   Future<TravelExpenseModel?> getTravelExpenseById(int id) async {
     try {
       return await _databaseHelper.getTravelExpenseById(id);
@@ -53,11 +64,20 @@ class TravelExpensesLocalDataSource implements TravelExpensesDataSource {
     }
   }
 
-  Future<void> syncWithRemote(List<TravelExpenseModel> remoteExpenses) async {
+  @override
+  Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
     try {
-      await _databaseHelper.batchInsert(remoteExpenses);
+      final infoModel = TravelExpensesInfoModel.fromJson(remoteData);
+      
+      await _databaseHelper.batchInsertExpenses(
+        infoModel.despesasdeviagem.map((e) => e as TravelExpenseModel).toList()
+      );
+      
+      await _databaseHelper.batchInsertCards(
+        infoModel.cartoes.map((e) => e as TravelCardModel).toList()
+      );
     } catch (e) {
-      throw DatabaseException(message: 'Failed to sync expenses with remote: $e');
+      throw DatabaseException(message: 'Failed to sync with remote: $e');
     }
   }
 }
@@ -67,3 +87,4 @@ class DatabaseException implements Exception {
 
   const DatabaseException({required this.message});
 }
+

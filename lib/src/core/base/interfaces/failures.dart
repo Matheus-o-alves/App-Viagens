@@ -7,7 +7,10 @@ abstract class Failure {
 class ServerFailure extends Failure {
   final int statusCode;
   
-  const ServerFailure({required super.message, required this.statusCode});
+  const ServerFailure({
+    required String message,
+    this.statusCode = 500,
+  }) : super(message: message);
 }
 
 class ConnectionFailure extends Failure {

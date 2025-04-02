@@ -1,15 +1,18 @@
-// domain/datasources/travel_expenses_data_source.dart
 import '../../../exports.dart';
-import '../../domain/domain.dart';
 
-abstract class TravelExpensesDataSource {
+abstract class TravelExpensesRemoteDataSource implements TravelExpensesDataSource {
   Future<TravelExpensesInfoEntity> getTravelExpensesInfo();
   
-  // Métodos para manipulação de despesas individuais
+  // Os métodos abaixo são implementados diferentemente por cada subclasse
+  @override
   Future<int> saveTravelExpense(TravelExpenseModel expense);
+  
+  @override
   Future<int> deleteTravelExpense(int id);
+  
+  @override
   Future<TravelExpenseModel?> getTravelExpenseById(int id);
   
-  // Método para sincronização
+  @override
   Future<void> syncWithRemote(Map<String, dynamic> remoteData);
 }

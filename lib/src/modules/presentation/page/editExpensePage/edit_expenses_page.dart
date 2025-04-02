@@ -32,22 +32,44 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
   late String _selectedCategory;
   late String _selectedPaymentMethod;
   bool _isReimbursable = true;
+  
+  // Flag para rastrear se já inicializamos o formulário
+  bool _formInitialized = false;
+  // Armazenar o último estado para inicialização segura
+  TravelExpenseEntity? _lastExpenseState;
 
   @override
   void initState() {
     super.initState();
+    // Inicialização com valores padrão
     _selectedCategory = _categories.first;
     _selectedPaymentMethod = _paymentMethods.first;
     _selectedDate = DateTime.now();
 
     if (widget.expense != null) {
-      _initializeFormWithExpense(widget.expense!);
+      // Apenas carregue a despesa do repositório
       context.read<ExpenseFormBloc>().add(LoadExpense(widget.expense!.id));
     } else {
       context.read<ExpenseFormBloc>().add(const InitializeNewExpense());
     }
+
+    // Adicione um callback pós-frame para inicializar o formulário se necessário
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _applyPendingExpenseUpdate();
+    });
   }
 
+  // Método para aplicar atualizações pendentes após o frame ser renderizado
+  void _applyPendingExpenseUpdate() {
+    if (!_formInitialized && _lastExpenseState != null) {
+      setState(() {
+        _initializeFormWithExpense(_lastExpenseState!);
+        _formInitialized = true;
+      });
+    }
+  }
+
+  // Inicializa o formulário com dados da despesa sem usar setState diretamente
   void _initializeFormWithExpense(TravelExpenseEntity expense) {
     _selectedDate = expense.expenseDate;
     _descriptionController.text = expense.description;
@@ -77,16 +99,16 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
     if (_formKey.currentState!.validate()) {
       final double amount = double.parse(_amountController.text.replaceAll(',', '.'));
 
+      // Criar o modelo usando o novo formato de dados
       final TravelExpenseModel expense = TravelExpenseModel(
         id: widget.expense?.id ?? 0,
         expenseDate: _selectedDate,
-        expenseDateFormatted: DateFormat('MM/dd/yyyy').format(_selectedDate),
         description: _descriptionController.text,
-        category: _selectedCategory,
-        amount: amount,
-        reimbursable: _isReimbursable,
+        categoria: _selectedCategory,
+        quantidade: amount,
+        reembolsavel: _isReimbursable,
         isReimbursed: widget.expense?.isReimbursed ?? false,
-        status: widget.expense?.status ?? 'scheduled',
+        status: widget.expense?.status ?? 'programado',
         paymentMethod: _selectedPaymentMethod,
       );
 
@@ -122,7 +144,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.expense == null ? 'Add Expense' : 'Edit Expense',
+          widget.expense == null ? 'Adicionar Despesa' : 'Editar Despesa',
           style: const TextStyle(color: Colors.white),
         ),
         backgroundColor: const Color(0xFF1A73E8),
@@ -151,6 +173,14 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                 backgroundColor: Colors.red,
               ),
             );
+          } else if (state is ExpenseFormReady && state.expense != null && !_formInitialized) {
+            // Armazene o estado para aplicá-lo após o frame ser renderizado
+            _lastExpenseState = state.expense;
+            
+            // Use addPostFrameCallback para aplicar a atualização após o build atual
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _applyPendingExpenseUpdate();
+            });
           }
         },
         builder: (context, state) {
@@ -164,14 +194,12 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                 children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
-                  Text('Saving expense...'),
+                  Text('Salvando despesa...'),
                 ],
               ),
             );
           }
-          if (state is ExpenseFormReady && state.expense != null && widget.expense == null) {
-            _initializeFormWithExpense(state.expense!);
-          }
+
           return Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -183,23 +211,23 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                     onTap: () => _selectDate(context),
                     child: InputDecorator(
                       decoration: const InputDecoration(
-                        labelText: 'Date',
+                        labelText: 'Data',
                         border: OutlineInputBorder(),
                         suffixIcon: Icon(Icons.calendar_today),
                       ),
-                      child: Text(DateFormat('MMM dd, yyyy').format(_selectedDate)),
+                      child: Text(DateFormat('dd/MM/yyyy').format(_selectedDate)),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _descriptionController,
                     decoration: const InputDecoration(
-                      labelText: 'Description',
+                      labelText: 'Descrição',
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter a description';
+                        return 'Por favor, informe uma descrição';
                       }
                       return null;
                     },
@@ -208,7 +236,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                   DropdownButtonFormField<String>(
                     value: _selectedCategory,
                     decoration: const InputDecoration(
-                      labelText: 'Category',
+                      labelText: 'Categoria',
                       border: OutlineInputBorder(),
                     ),
                     items: _categories.map((category) {
@@ -229,19 +257,19 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                   TextFormField(
                     controller: _amountController,
                     decoration: const InputDecoration(
-                      labelText: 'Amount',
+                      labelText: 'Valor',
                       border: OutlineInputBorder(),
-                      prefixText: '\$ ',
+                      prefixText: 'R\$ ',
                     ),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter an amount';
+                        return 'Por favor, informe um valor';
                       }
                       try {
                         double.parse(value.replaceAll(',', '.'));
                       } catch (_) {
-                        return 'Please enter a valid number';
+                        return 'Por favor, informe um número válido';
                       }
                       return null;
                     },
@@ -250,7 +278,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                   DropdownButtonFormField<String>(
                     value: _selectedPaymentMethod,
                     decoration: const InputDecoration(
-                      labelText: 'Payment Method',
+                      labelText: 'Método de Pagamento',
                       border: OutlineInputBorder(),
                     ),
                     items: _paymentMethods.map((method) {
@@ -269,8 +297,8 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                   ),
                   const SizedBox(height: 16),
                   SwitchListTile(
-                    title: const Text('Reimbursable'),
-                    subtitle: const Text('Is this expense reimbursable?'),
+                    title: const Text('Reembolsável'),
+                    subtitle: const Text('Esta despesa é reembolsável?'),
                     value: _isReimbursable,
                     activeColor: Theme.of(context).primaryColor,
                     onChanged: (bool value) {
@@ -291,7 +319,7 @@ class _ExpenseFormPageState extends State<ExpenseFormPage> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
-                      child: Text(widget.expense == null ? 'Add Expense' : 'Save Changes'),
+                      child: Text(widget.expense == null ? 'Adicionar Despesa' : 'Salvar Alterações'),
                     ),
                   ),
                 ],

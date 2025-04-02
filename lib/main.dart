@@ -7,7 +7,6 @@ import 'package:onfly_viagens_app/src/modules/presentation/page/homePage/home_pa
     show TravelExpensesPage;
 import 'src/core/services/database_sync_service.dart';
 import 'src/modules/presentation/di/di.dart' as di;
-import 'src/modules/presentation/page/loginPage/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +42,7 @@ class MyApp extends StatelessWidget {
       ),
       home: BlocProvider(
         create: (_) => di.sl<TravelExpensesBloc>(),
-        child: const LoginPage(),
+        child: const TravelExpensesPage(),
       ),
     );
   }

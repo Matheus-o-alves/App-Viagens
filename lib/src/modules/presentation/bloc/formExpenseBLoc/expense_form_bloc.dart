@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:onfly_viagens_app/src/modules/domain/usecase/get_travel_expense_by_id_use_case.dart';
-import 'package:onfly_viagens_app/src/modules/domain/usecase/save_travel_expenses_usecase.dart' show SaveTravelExpenseUseCase;
+import '../../../../exports.dart';
+
 import '../../../../core/core.dart';
 
 import 'expense_form_event.dart';
@@ -54,8 +54,8 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
       (id) => emit(ExpenseFormSuccess(
         isNewExpense: isNewExpense,
         message: isNewExpense 
-            ? 'Expense added successfully'
-            : 'Expense updated successfully',
+            ? 'Despesa adicionada com sucesso'
+            : 'Despesa atualizada com sucesso',
       )),
     );
   }
@@ -63,13 +63,13 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
       case ServerFailure:
-        return 'Server error occurred';
+        return 'Erro no servidor';
       case ConnectionFailure:
-        return 'No internet connection';
+        return 'Sem conexão com a internet';
       case DatabaseFailure:
-        return 'Database error: ${failure.message}';
+        return 'Erro no banco de dados: ${failure.message}';
       default:
-        return 'An unexpected error occurred';
+        return 'Ocorreu um erro inesperado';
     }
   }
 }

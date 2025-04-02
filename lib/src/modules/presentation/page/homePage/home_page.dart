@@ -1,31 +1,17 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
-import 'package:onfly_viagens_app/src/modules/presentation/bloc/homePageBloc/home_page_state.dart'
-    show TravelExpenseActionSuccess, TravelExpensesError, TravelExpensesInitial, TravelExpensesLoaded, TravelExpensesLoading, TravelExpensesState;
-import 'package:onfly_viagens_app/src/modules/presentation/page/editExpensePage/edit_expenses_page.dart'
-    show ExpenseFormPage;
-import 'package:onfly_viagens_app/src/modules/presentation/page/homePage/components/loading_travels_component.dart'
-    show LoadingView;
-import 'package:onfly_viagens_app/src/modules/presentation/page/homePage/components/payment_card_component.dart'
-    show ExpenseCard;
-import '../../../domain/domain.dart';
 
-import '../../bloc/formExpenseBLoc/expense_form_bloc.dart';
-import '../../bloc/homePageBloc/home_page_bloc.dart';
-import '../../bloc/homePageBloc/home_page_event.dart';
-import '../components/error_component.dart';
+import '../../../../exports.dart';
 
-// Obtenha a instância do GetIt
 final sl = GetIt.instance;
 
 class TravelExpensesPage extends StatelessWidget {
   const TravelExpensesPage({Key? key}) : super(key: key);
 
-  // Função para navegar para o formulário, repassando o TravelExpensesBloc.
   void _navigateToExpenseForm(BuildContext context, TravelExpenseEntity? expense) {
-    // Armazena o TravelExpensesBloc atual para repassar à nova rota.
     final travelExpensesBloc = context.read<TravelExpensesBloc>();
     Navigator.push(
       context,
