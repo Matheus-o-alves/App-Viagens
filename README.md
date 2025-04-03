@@ -40,7 +40,7 @@ O projeto segue os princípios da Clean Architecture, dividindo o código em cam
 
 
 ### Diagrama de Arquitetura
-
+```
 lib/
 ├── core/
 │   ├── base/
@@ -69,6 +69,7 @@ lib/
 │       ├── ui/
 │       └── page/
 
+```
 ## Configuração do Ambiente
 
 ### Pré-requisitos
