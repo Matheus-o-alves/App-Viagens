@@ -1,50 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
-import '../../../../exports.dart';
-import 'components/expense_form_component.dart';
-import 'components/saving_indicator_component.dart';
+import '../../../../../exports.dart';
+import 'expense_form_component.dart';
+import 'saving_indicator_component.dart';
 
-
-class ExpenseFormPage extends StatelessWidget {
-  final TravelExpenseEntity? expense;
-
-  const ExpenseFormPage({super.key, this.expense});
+class _ExpenseFormView extends StatefulWidget {
+  const _ExpenseFormView();
 
   @override
-  Widget build(BuildContext context) {
-    // Usando o bloc já existente, apenas adicionando eventos a ele
-    if (expense != null) {
-      context.read<ExpenseFormBloc>().add(LoadExpense(expense!.id));
-    } else {
-      context.read<ExpenseFormBloc>().add(const InitializeNewExpense());
-    }
-
-    return const ExpenseFormView();
-  }
+  State<_ExpenseFormView> createState() => _ExpenseFormViewState();
 }
 
-// View principal do formulário
-class ExpenseFormView extends StatelessWidget {
-  const ExpenseFormView({Key? key}) : super(key: key);
-
+class _ExpenseFormViewState extends State<_ExpenseFormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: BlocBuilder<ExpenseFormBloc, ExpenseFormState>(
-          buildWhen: (previous, current) => 
-              current is ExpenseFormLoaded || current is ExpenseFormReady,
+          buildWhen: (previous, current) => current is ExpenseFormLoaded,
           builder: (context, state) {
-            final bool isNewExpense = state is ExpenseFormReady 
-                ? state.expense == null 
-                : (state is ExpenseFormLoaded ? state.expense == null : true);
-                
-            return Text(
-              isNewExpense ? 'Adicionar Despesa' : 'Editar Despesa',
-              style: const TextStyle(color: Colors.white),
-            );
+            if (state is ExpenseFormLoaded) {
+              return Text(
+                state.expense == null ? 'Adicionar Despesa' : 'Editar Despesa',
+                style: const TextStyle(color: Colors.white),
+              );
+            }
+            return const Text('Despesa', style: TextStyle(color: Colors.white));
           },
         ),
         backgroundColor: const Color(0xFF1A73E8),
@@ -68,11 +50,6 @@ class ExpenseFormView extends StatelessWidget {
             return const SavingIndicator();
           } else if (state is ExpenseFormLoaded) {
             return ExpenseForm(state: state);
-          } else if (state is ExpenseFormReady) {
-            // Suporte para o estado atual
-            return const Center(
-              child: Text('O formulário está sendo preparado...'),
-            );
           }
           return const Center(child: CircularProgressIndicator());
         },

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import '../../domain/domain.dart';
 import '../../infra/database/database_helper.dart';
 import '../../infra/datasource/travel_expenses_data_source.dart';
-import '../../infra/datasource/travel_expenses_local_data_source.dart' show TravelExpensesLocalDataSource;
+import '../../infra/datasource/travel_expenses_local_data_source.dart'
+    show TravelExpensesLocalDataSource;
 import '../data.dart';
 
 import '../model/travels/travel_card_model.dart';
@@ -12,26 +13,30 @@ import '../model/travels/travel_card_model.dart';
 import '../../infra/database/database_helper.dart';
 import '../../infra/datasource/travel_expenses_data_source.dart';
 
-
-
-
-class TravelExpensesLocalDataSourceImpl implements TravelExpensesLocalDataSource {
+class TravelExpensesLocalDataSourceImpl
+    implements TravelExpensesLocalDataSource {
   final DatabaseHelper _databaseHelper;
 
-  TravelExpensesLocalDataSourceImpl({required DatabaseHelper databaseHelper}) 
-      : _databaseHelper = databaseHelper;
+  TravelExpensesLocalDataSourceImpl({required DatabaseHelper databaseHelper})
+    : _databaseHelper = databaseHelper;
 
   @override
   Future<TravelExpensesInfoEntity> getTravelExpensesInfo() async {
     try {
       final expenses = await _databaseHelper.getAllTravelExpenses();
       final cards = await _databaseHelper.getAllTravelCards();
+      debugPrint('🔍 Cartões recuperados do banco (${cards.length}):');
+      for (var card in cards) {
+        debugPrint(card.toJson().toString());
+      }
       return TravelExpensesInfoModel(
         despesasdeviagem: expenses,
         cartoes: cards,
       );
     } catch (e) {
-      throw DatabaseException(message: 'Failed to get travel info from database: $e');
+      throw DatabaseException(
+        message: 'Failed to get travel info from database: $e',
+      );
     }
   }
 
@@ -44,7 +49,9 @@ class TravelExpensesLocalDataSourceImpl implements TravelExpensesLocalDataSource
         return await _databaseHelper.insertTravelExpense(expense);
       }
     } catch (e) {
-      throw DatabaseException(message: 'Failed to save expense to database: $e');
+      throw DatabaseException(
+        message: 'Failed to save expense to database: $e',
+      );
     }
   }
 
@@ -53,7 +60,9 @@ class TravelExpensesLocalDataSourceImpl implements TravelExpensesLocalDataSource
     try {
       return await _databaseHelper.deleteTravelExpense(id);
     } catch (e) {
-      throw DatabaseException(message: 'Failed to delete expense from database: $e');
+      throw DatabaseException(
+        message: 'Failed to delete expense from database: $e',
+      );
     }
   }
 
@@ -62,7 +71,9 @@ class TravelExpensesLocalDataSourceImpl implements TravelExpensesLocalDataSource
     try {
       return await _databaseHelper.getTravelExpenseById(id);
     } catch (e) {
-      throw DatabaseException(message: 'Failed to get expense by id from database: $e');
+      throw DatabaseException(
+        message: 'Failed to get expense by id from database: $e',
+      );
     }
   }
 
@@ -70,24 +81,24 @@ class TravelExpensesLocalDataSourceImpl implements TravelExpensesLocalDataSource
   Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
     try {
       final infoModel = TravelExpensesInfoModel.fromJson(remoteData);
-      
-     await _databaseHelper.batchInsertExpenses(
-  infoModel.despesasdeviagem.map((e) => e as TravelExpenseModel).toList()
-);
-debugPrint('✅ batchInsertExpenses concluído com sucesso');
 
-await _databaseHelper.batchInsertCards(
-  infoModel.cartoes.map((e) => e as TravelCardModel).toList()
-);
-debugPrint('✅ batchInsertCards concluído com sucesso');
+      await _databaseHelper.batchInsertExpenses(
+        infoModel.despesasdeviagem.map((e) => e as TravelExpenseModel).toList(),
+      );
+      debugPrint('✅ batchInsertExpenses concluído com sucesso');
+
+      await _databaseHelper.batchInsertCards(
+        infoModel.cartoes.map((e) => e as TravelCardModel).toList(),
+      );
+      debugPrint('✅ batchInsertCards concluído com sucesso');
     } catch (e) {
       throw DatabaseException(message: 'Failed to sync with remote: $e');
     }
   }
 }
+
 class DatabaseException implements Exception {
   final String message;
 
   const DatabaseException({required this.message});
 }
-

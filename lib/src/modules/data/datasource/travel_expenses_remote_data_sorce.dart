@@ -1,20 +1,10 @@
-
-
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
-import 'package:onfly_viagens_app/src/modules/domain/entity/payments_info_entity.dart';
-import 'package:onfly_viagens_app/src/modules/infra/datasource/travel_expenses_data_source.dart' show TravelExpensesDataSource;
 
-import '../../../core/base/base.dart';
+import '../../../exports.dart';
+import '../../infra/datasource/travel_expenses_local_data_source.dart';
 import '../../infra/datasource/travel_expenses_remote_data_source.dart';
-import '../data.dart';
-
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
-
-import '../../infra/datasource/travel_expenses_data_source.dart';
+import '../model/travels/travel_card_model.dart';
 
 class ServerException implements Exception {
   final String message;
@@ -23,72 +13,89 @@ class ServerException implements Exception {
   ServerException({required this.message, required this.statusCode});
 }
 
-
 class TravelExpensesRemoteDataSourceImpl implements TravelExpensesRemoteDataSource {
   final http.Client client;
-  final String baseUrl = 'https://api.mocki.io/v2/ezwra77r'; // Substitua pela URL real da sua API
+  final TravelExpensesLocalDataSource localDataSource;
 
-  TravelExpensesRemoteDataSourceImpl({required this.client});
+  TravelExpensesRemoteDataSourceImpl({
+    required this.client, 
+    required this.localDataSource
+  });
 
-  @override
-  Future<TravelExpensesInfoEntity> getTravelExpensesInfo() async {
-    try {
-      final response = await client.get(
-        Uri.parse(baseUrl),
-        headers: {'Content-Type': 'application/json'},
-      );
+@override
+Future<TravelExpensesInfoEntity> getTravelExpensesInfo() async {
+  try {
+    // Use the mock JSON directly from payments_json.dart
+    final Map<String, dynamic> jsonData = mockPaymentsJson;
+    
+    // Converta diretamente para o modelo, forçando o tipo correto
+    final expenses = (jsonData['travelExpenses'] as List)
+        .map((e) => TravelExpenseModel(
+          id: e['id'] ?? 0,
+          expenseDate: DateTime.parse(e['expenseDate']),
+          description: e['description'] ?? '',
+          categoria: e['category'] ?? e['categoria'] ?? '',
+          quantidade: (e['amount'] ?? e['quantidade'] ?? 0.0).toDouble(),
+          reembolsavel: e['reimbursable'] ?? e['reembolsavel'] ?? false,
+          isReimbursed: e['isReimbursed'] ?? false,
+          status: e['status'] ?? '',
+          paymentMethod: e['paymentMethod'] ?? '',
+        ))
+        .toList();
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = json.decode(response.body);
-        return TravelExpensesInfoModel.fromJson(jsonData);
-      } else {
-        throw ServerException(
-          message: 'Failed to load travel expenses',
-          statusCode: response.statusCode,
-        );
-      }
-    } catch (e) {
-      throw ServerException(
-        message: 'Connection error: $e',
-        statusCode: 503, // Service Unavailable
-      );
-    }
+    final cards = (jsonData['cards'] as List)
+        .map((e) => TravelCardModel(
+          id: e['id'] ?? 0,
+          nome: e['name'] ?? e['nome'] ?? '',
+          numero: e['number'] ?? e['numero'] ?? '',
+          titular: e['holder'] ?? e['titular'] ?? '',
+          validade: e['validThru'] ?? e['validade'] ?? '',
+          bandeira: e['brand'] ?? e['bandeira'] ?? '',
+          limiteDisponivel: (e['availableLimit'] ?? e['limiteDisponivel'] ?? 0.0).toDouble(),
+        ))
+        .toList();
+
+    // Crie o modelo de informações
+    final infoModel = TravelExpensesInfoModel(
+      despesasdeviagem: expenses,
+      cartoes: cards,
+    );
+
+    // Sincronize com o banco de dados local
+    await syncWithRemote(infoModel.toJson());
+    
+    return infoModel;
+  } catch (e) {
+    throw ServerException(
+      message: 'Failed to load travel expenses: $e',
+      statusCode: 500,
+    );
   }
+}
+
+@override
+Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
+  try {
+    // Converta e insira no banco local
+    await localDataSource.syncWithRemote(remoteData);
+  } catch (e) {
+    throw ServerException(
+      message: 'Failed to sync with remote: $e',
+      statusCode: 500,
+    );
+  }
+}
 
   @override
   Future<int> saveTravelExpense(TravelExpenseModel expense) async {
     try {
-      final url = expense.id == 0 
-          ? Uri.parse('$baseUrl/travel-expenses') 
-          : Uri.parse('$baseUrl/travel-expenses/${expense.id}');
-      
-      final method = expense.id == 0 ? 'POST' : 'PUT';
-      
-      final response = await (method == 'POST' 
-          ? client.post(
-              url,
-              headers: {'Content-Type': 'application/json'},
-              body: json.encode(expense.toJson()),
-            )
-          : client.put(
-              url,
-              headers: {'Content-Type': 'application/json'},
-              body: json.encode(expense.toJson()),
-            ));
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> jsonData = json.decode(response.body);
-        return jsonData['id'] ?? expense.id;
-      } else {
-        throw ServerException(
-          message: 'Failed to save travel expense',
-          statusCode: response.statusCode,
-        );
-      }
+      // Save the expense to local database
+      final savedId = await localDataSource.saveTravelExpense(expense);
+      return savedId;
     } catch (e) {
       throw ServerException(
-        message: 'Connection error: $e',
-        statusCode: 503, // Service Unavailable
+        message: 'Failed to save travel expense: $e',
+        statusCode: 500,
       );
     }
   }
@@ -96,23 +103,12 @@ class TravelExpensesRemoteDataSourceImpl implements TravelExpensesRemoteDataSour
   @override
   Future<int> deleteTravelExpense(int id) async {
     try {
-      final response = await client.delete(
-        Uri.parse('$baseUrl/travel-expenses/$id'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        return id;
-      } else {
-        throw ServerException(
-          message: 'Failed to delete travel expense',
-          statusCode: response.statusCode,
-        );
-      }
+      // Delete the expense from local database
+      return await localDataSource.deleteTravelExpense(id);
     } catch (e) {
       throw ServerException(
-        message: 'Connection error: $e',
-        statusCode: 503, // Service Unavailable
+        message: 'Failed to delete travel expense: $e',
+        statusCode: 500,
       );
     }
   }
@@ -120,34 +116,84 @@ class TravelExpensesRemoteDataSourceImpl implements TravelExpensesRemoteDataSour
   @override
   Future<TravelExpenseModel?> getTravelExpenseById(int id) async {
     try {
-      final response = await client.get(
-        Uri.parse('$baseUrl/travel-expenses/$id'),
-        headers: {'Content-Type': 'application/json'},
-      );
+      // First, try to get from local database
+      final localExpense = await localDataSource.getTravelExpenseById(id);
+      if (localExpense != null) return localExpense;
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = json.decode(response.body);
-        return TravelExpenseModel.fromJson(jsonData);
-      } else if (response.statusCode == 404) {
-        return null;
-      } else {
-        throw ServerException(
-          message: 'Failed to get travel expense by id',
-          statusCode: response.statusCode,
-        );
-      }
+      // If not found locally, use mock data
+      final Map<String, dynamic> jsonData = mockPaymentsJson;
+      
+      // Find expense by ID in mock data
+      final expenses = jsonData['travelExpenses'] as List<dynamic>;
+      final expenseData = expenses.firstWhere(
+        (expense) => expense['id'] == id,
+        orElse: () => null,
+      );
+      
+      return expenseData != null 
+        ? TravelExpenseModel.fromJson(expenseData) 
+        : null;
     } catch (e) {
       throw ServerException(
-        message: 'Connection error: $e',
-        statusCode: 503, // Service Unavailable
+        message: 'Failed to get travel expense by id: $e',
+        statusCode: 500,
       );
     }
   }
 
-  @override
-  Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
-    // Para a implementação remota, não é necessário sincronizar dados locais
-    // com o servidor, pois os dados já vêm do servidor
-    return;
+
+
+  // Helper method to convert entity to sync data
+  Map<String, dynamic> _convertEntityToSyncData(
+    TravelExpensesInfoEntity entity,
+  ) {
+    final despesas = entity.despesasdeviagem
+        .map((e) {
+          try {
+            return (e is TravelExpenseModel)
+                ? e.toJson()
+                : {
+                    'id': e.id,
+                    'expenseDate': e.expenseDate.toIso8601String(),
+                    'description': e.description,
+                    'categoria': e.categoria,
+                    'quantidade': e.quantidade,
+                    'reembolsavel': e.reembolsavel,
+                    'isReimbursed': e.isReimbursed,
+                    'status': e.status,
+                    'paymentMethod': e.paymentMethod,
+                  };
+          } catch (ex) {
+            print('Erro ao converter despesa: $ex');
+            return {};
+          }
+        })
+        .where((map) => map.isNotEmpty)
+        .toList();
+
+    final cartoes = entity.cartoes
+        .map((e) {
+          try {
+            return {
+              'id': e.id,
+              'nome': e.nome,
+              'numero': e.numero,
+              'titular': e.titular,
+              'validade': e.validade,
+              'bandeira': e.bandeira,
+              'limiteDisponivel': e.limiteDisponivel,
+            };
+          } catch (ex) {
+            print('Erro ao converter cartão: $ex');
+            return {};
+          }
+        })
+        .where((map) => map.isNotEmpty)
+        .toList();
+
+    return {
+      'despesasdeviagem': despesas, 
+      'cartoes': cartoes
+    };
   }
 }

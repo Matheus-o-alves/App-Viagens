@@ -206,16 +206,19 @@ Future<void> batchInsertExpenses(List<TravelExpenseModel> expenses) async {
 
 
 
-  // TRAVEL CARDS METHODS
-  Future<List<TravelCardModel>> getAllTravelCards() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('travel_cards');
-    
-    return List.generate(maps.length, (i) {
-      return TravelCardModel.fromJson(maps[i]);
-    });
+ Future<List<TravelCardModel>> getAllTravelCards() async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query('travel_cards');
+
+  debugPrint('🔎 Cartões encontrados no banco (${maps.length}):');
+  for (var map in maps) {
+    debugPrint(map.toString());
   }
 
+  return List.generate(maps.length, (i) {
+    return TravelCardModel.fromJson(maps[i]);
+  });
+}
   Future<int> insertTravelCard(TravelCardModel card) async {
     final db = await database;
     return await db.insert(

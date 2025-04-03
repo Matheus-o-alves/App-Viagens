@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../../core/core.dart';
+import '../../../../../exports.dart';
 import '../../../../domain/domain.dart';
 
 class ExpenseCard extends StatelessWidget {
@@ -10,27 +14,15 @@ class ExpenseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<TravelExpensesBloc>();
+
     final isReembolsado = expense.isReimbursed;
     final isReembolsavel = expense.reimbursable;
-    
-    final Color statusColor = isReembolsado
-        ? const Color(0xFF4CAF50)
-        : expense.status == 'pending_approval'
-            ? const Color(0xFFFFA000)
-            : expense.status == 'past_due'
-                ? const Color(0xFFF44336)
-                : const Color(0xFF1A73E8);
 
-    final String statusText = isReembolsado
-        ? 'Reembolsado'
-        : expense.status == 'pending_approval'
-            ? 'Aguardando Aprovação'
-            : expense.status == 'past_due'
-                ? 'Vencido'
-                : 'Agendado';
-
-    final IconData paymentMethodIcon = _getPaymentMethodIcon(expense.paymentMethod);
-    final IconData categoryIcon = _getCategoryIcon(expense.category);
+    final Color statusColor = bloc.getStatusColor(expense);
+    final String statusText = bloc.getStatusText(expense);
+    final IconData paymentMethodIcon = bloc.getPaymentMethodIcon(expense.paymentMethod);
+    final IconData categoryIcon = bloc.getCategoryIcon(expense.category);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -55,7 +47,7 @@ class ExpenseCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    expense.description,
+                    bloc.sanitizeText(expense.description),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -81,12 +73,10 @@ class ExpenseCard extends StatelessWidget {
             ),
           ),
 
-          // Conteúdo
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Data
                 Row(
                   children: [
                     const Icon(Icons.calendar_today, color: Color(0xFF757575), size: 20),
@@ -102,14 +92,13 @@ class ExpenseCard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // Categoria
                 Row(
                   children: [
                     Icon(categoryIcon, color: const Color(0xFF757575), size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Categoria: ${expense.category}',
+                        'Categoria: ${bloc.sanitizeText(expense.category)}',
                         style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
                       ),
                     ),
@@ -118,7 +107,6 @@ class ExpenseCard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // Valor
                 Row(
                   children: [
                     const Icon(Icons.account_balance_wallet, color: Color(0xFF757575), size: 20),
@@ -132,7 +120,6 @@ class ExpenseCard extends StatelessWidget {
                   ],
                 ),
 
-                // Info de Reembolso
                 if (isReembolsavel && !isReembolsado) ...[
                   const SizedBox(height: 12),
                   Container(
@@ -142,10 +129,10 @@ class ExpenseCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
-                      children: [
-                        const Icon(Icons.info_outline, color: Colors.blue, size: 16),
-                        const SizedBox(width: 8),
-                        const Expanded(
+                      children: const [
+                        Icon(Icons.info_outline, color: Colors.blue, size: 16),
+                        SizedBox(width: 8),
+                        Expanded(
                           child: Text(
                             'Esta despesa é elegível para reembolso',
                             style: TextStyle(color: Colors.blue, fontSize: 12),
@@ -156,7 +143,6 @@ class ExpenseCard extends StatelessWidget {
                   ),
                 ],
 
-                // Método de Pagamento
                 const Divider(),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
@@ -166,7 +152,7 @@ class ExpenseCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Forma de Pagamento: ${expense.paymentMethod}',
+                          'Forma de Pagamento: ${bloc.sanitizeText(expense.paymentMethod)}',
                           style: const TextStyle(color: Color(0xFF757575)),
                         ),
                       ),
@@ -177,7 +163,6 @@ class ExpenseCard extends StatelessWidget {
             ),
           ),
 
-          // Botões
           if (!isReembolsado && isReembolsavel)
             Container(
               decoration: const BoxDecoration(
@@ -192,9 +177,7 @@ class ExpenseCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () {
-                      // Ver detalhes
-                    },
+                    onPressed: () {},
                     child: const Text('Ver Detalhes'),
                   ),
                   const SizedBox(width: 8),
@@ -203,9 +186,7 @@ class ExpenseCard extends StatelessWidget {
                       backgroundColor: const Color(0xFF1A73E8),
                       foregroundColor: Colors.white,
                     ),
-                    onPressed: () {
-                      // Solicitar reembolso
-                    },
+                    onPressed: () {},
                     child: const Text('Solicitar Reembolso'),
                   ),
                 ],
@@ -214,31 +195,5 @@ class ExpenseCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  IconData _getPaymentMethodIcon(String paymentMethod) {
-    switch (paymentMethod.toLowerCase()) {
-      case 'cartão corporativo':
-        return Icons.credit_card;
-      case 'dinheiro':
-        return Icons.attach_money;
-      case 'aplicativo':
-        return Icons.phone_android;
-      default:
-        return Icons.payment;
-    }
-  }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'transporte':
-        return Icons.directions_car;
-      case 'hospedagem':
-        return Icons.hotel;
-      case 'alimentação':
-        return Icons.restaurant;
-      default:
-        return Icons.category;
-    }
   }
 }

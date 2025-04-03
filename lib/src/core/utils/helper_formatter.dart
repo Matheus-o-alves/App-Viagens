@@ -68,3 +68,4 @@ class TextNormalizer {
     return standardPaymentMethods.first;
   }
 }
+

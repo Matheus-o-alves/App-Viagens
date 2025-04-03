@@ -1,39 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../exports.dart';
+import '../../bloc/loginBloc/login_bloc.dart';
+import '../../bloc/loginBloc/login_event.dart';
+import '../../bloc/loginBloc/login_state.dart';
+import '../homePage/travel_expenses_page.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Login OnFly"),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: BlocProvider(
+        create: (context) => sl<LoginBloc>(),
+        child: const LoginForm(),
+      ),
+    );
+  }
 }
 
-class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class LoginForm extends StatefulWidget {
+  const LoginForm({Key? key}) : super(key: key);
 
-  bool _isLoading = false;
-  String? _errorMessage;
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
 
-  void _submitLogin() async {
-    setState(() {
-      _errorMessage = null;
-    });
+class _LoginFormState extends State<LoginForm> {
+  final _emailController = TextEditingController(text: 'teste@onfly.com');
+  final _passwordController = TextEditingController(text: '123456');
 
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() => _isLoading = true);
+  @override
+  void initState() {
+    super.initState();
+    // Atualiza o BLoC quando o texto dos campos muda
+    _emailController.addListener(_onEmailChanged);
+    _passwordController.addListener(_onPasswordChanged);
+  }
 
-      // Simulação de chamada de API
-      await Future.delayed(const Duration(seconds: 1));
+  void _onEmailChanged() {
+    context.read<LoginBloc>().add(EmailChanged(_emailController.text));
+  }
 
-      if (_emailController.text == 'teste@onfly.com' && _passwordController.text == '123456') {
-        if (mounted) Navigator.pushReplacementNamed(context, '/home');
-      } else {
-        setState(() => _errorMessage = 'Credenciais inválidas');
-      }
-
-      setState(() => _isLoading = false);
-    }
+  void _onPasswordChanged() {
+    context.read<LoginBloc>().add(PasswordChanged(_passwordController.text));
   }
 
   @override
@@ -45,82 +60,145 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Bem-vindo à Onfly',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    color: theme.primaryColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty || !value.contains('@')) {
-                      return 'Informe um email válido';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Senha',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Digite sua senha';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                if (_errorMessage != null)
-                  Text(
-                    _errorMessage!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _submitLogin,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Entrar'),
-                  ),
-                ),
-              ],
+    return BlocConsumer<LoginBloc, LoginState>(
+      listenWhen: (previous, current) {
+        // Só escuta mudanças relevantes para navegação ou mensagens
+        return current is LoginSuccess || 
+               current is LoginFailure || 
+               current is LoginValidationError;
+      },
+      listener: (context, state) {
+        if (state is LoginSuccess) {
+          _showSnackbar(context, 'Login realizado com sucesso!');
+          Navigator.pushReplacementNamed(context, AppRoutes.home);
+        } else if (state is LoginFailure) {
+          _showSnackbar(context, state.error);
+        }
+      },
+      buildWhen: (previous, current) {
+        // Reconstruir apenas para estados que afetam a UI
+        return current is LoginInitial || 
+               current is LoginLoading || 
+               current is LoginFormState || 
+               current is LoginValidationError;
+      },
+      builder: (context, state) {
+        if (state is LoginLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildLogo(),
+                  const SizedBox(height: 32),
+                  _buildEmailField(context, state),
+                  const SizedBox(height: 16),
+                  _buildPasswordField(context, state),
+                  const SizedBox(height: 32),
+                  _buildLoginButton(context, state),
+                ],
+              ),
             ),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLogo() {
+    return const Text(
+      "OnFly",
+      style: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: Colors.blueAccent,
+      ),
+    );
+  }
+
+  Widget _buildEmailField(BuildContext context, LoginState state) {
+    // Obter o erro de email do estado
+    String? emailError;
+    if (state is LoginFormState) {
+      emailError = state.emailError;
+    } else if (state is LoginValidationError) {
+      emailError = state.emailError;
+    }
+
+    return TextField(
+      controller: _emailController,
+      decoration: InputDecoration(
+        labelText: 'Email',
+        border: const OutlineInputBorder(),
+        prefixIcon: const Icon(Icons.email),
+        errorText: emailError,
+      ),
+      keyboardType: TextInputType.emailAddress,
+    );
+  }
+
+  Widget _buildPasswordField(BuildContext context, LoginState state) {
+    // Obter o erro de senha do estado
+    String? passwordError;
+    if (state is LoginFormState) {
+      passwordError = state.passwordError;
+    } else if (state is LoginValidationError) {
+      passwordError = state.passwordError;
+    }
+
+    return TextField(
+      controller: _passwordController,
+      obscureText: true,
+      decoration: InputDecoration(
+        labelText: 'Senha',
+        border: const OutlineInputBorder(),
+        prefixIcon: const Icon(Icons.lock),
+        errorText: passwordError,
+      ),
+    );
+  }
+
+  Widget _buildLoginButton(BuildContext context, LoginState state) {
+    // Verificar se o formulário é válido
+    bool isFormValid = false;
+    if (state is LoginFormState) {
+      isFormValid = state.isFormValid;
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          // Envia o evento de login para o BLoC
+          context.read<LoginBloc>().add(
+            LoginSubmitted(
+              email: _emailController.text,
+              password: _passwordController.text,
+            ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
+        child: const Text(
+          "Entrar",
+          style: TextStyle(fontSize: 16),
         ),
       ),
+    );
+  }
+
+  void _showSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 }

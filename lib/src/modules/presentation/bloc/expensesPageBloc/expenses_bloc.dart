@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/core.dart';
 import '../../../../core/services/database_sync_service.dart';
@@ -7,8 +10,8 @@ import '../../../domain/domain.dart';
 import '../../../domain/usecase/delete_travels_usescases.dart';
 import '../../../domain/usecase/get_travel_expense_by_id_use_case.dart';
 import '../../../domain/usecase/save_travel_expenses_usecase.dart';
-import 'home_page_event.dart';
-import 'home_page_state.dart';
+import 'expenses_event.dart';
+import 'expenses_state.dart';
 
 class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> {
   final GetTravelExpensesUseCase getTravelExpensesUseCase;
@@ -30,9 +33,9 @@ class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> 
     on<GetTravelExpenseDetails>(_onGetTravelExpenseDetails);
     on<SyncTravelExpenses>(_onSyncTravelExpenses);
 
-    // 🔄 Inicializa o serviço de sincronização com o callback no construtor
     final syncService = GetIt.instance<DatabaseSyncService>();
     syncService.initializeWithCallback(() {
+      debugPrint('📦 Callback do DatabaseSyncService chamado!');
       add(const FetchTravelExpenses());
     });
   }
@@ -165,5 +168,49 @@ class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> 
       default:
         return 'An unexpected error occurred';
     }
+  }
+
+  String sanitizeText(String input) {
+    try {
+      return const Utf8Decoder().convert(input.codeUnits);
+    } catch (_) {
+      return input;
+    }
+  }
+
+  String getStatusText(TravelExpenseEntity expense) {
+    if (expense.isReimbursed) return 'Reembolsado';
+    return switch (expense.status) {
+      'pending_approval' => 'Aguardando Aprovação',
+      'past_due' => 'Vencido',
+      _ => 'Agendado',
+    };
+  }
+
+  Color getStatusColor(TravelExpenseEntity expense) {
+    if (expense.isReimbursed) return const Color(0xFF4CAF50);
+    return switch (expense.status) {
+      'pending_approval' => const Color(0xFFFFA000),
+      'past_due' => const Color(0xFFF44336),
+      _ => const Color(0xFF1A73E8),
+    };
+  }
+
+  IconData getPaymentMethodIcon(String paymentMethod) {
+    return switch (paymentMethod.toLowerCase()) {
+      'cartão corporativo' => Icons.credit_card,
+      'dinheiro' => Icons.attach_money,
+      'aplicativo' => Icons.phone_android,
+      _ => Icons.payment,
+    };
+  }
+
+  IconData getCategoryIcon(String category) {
+    return switch (category.toLowerCase()) {
+      'transporte' => Icons.directions_car,
+      'hospedagem' => Icons.hotel,
+      'alimentação' => Icons.restaurant,
+      _ => Icons.category,
+    };
   }
 }
