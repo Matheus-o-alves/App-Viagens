@@ -148,7 +148,6 @@ test/
 - **dartz**: Programação funcional (Either para tratamento de erros)
 - **http**: Requisições HTTP
 - **sqflite**: Banco de dados local
-- **shared_preferences**: Armazenamento de preferências
 - **intl**: Internacionalização e formatação
 - **mockito**: Criação de mocks para testes
 - **bloc_test**: Testes para BLoCs
