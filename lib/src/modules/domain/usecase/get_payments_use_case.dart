@@ -2,10 +2,6 @@ import 'package:dartz/dartz.dart';
 import '../../../core/core.dart';
 import '../domain.dart';
 
-import 'package:dartz/dartz.dart';
-
-
-import '../entity/payments_info_entity.dart';
 
 
 class GetTravelExpensesUseCase implements UseCase<TravelExpensesInfoEntity, NoParams> {

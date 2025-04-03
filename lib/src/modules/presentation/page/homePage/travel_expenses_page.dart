@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../exports.dart';
-
 import 'components/expense_loaded_component.dart';
+
 
 class TravelExpensesPage extends StatelessWidget {
   const TravelExpensesPage({super.key});
@@ -19,7 +19,7 @@ class TravelExpensesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Travel Expenses'),
+        title: const Text('Quero Viajar com a Onfly', style: TextStyle(color: Colors.white),),
         backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
@@ -31,7 +31,7 @@ class TravelExpensesPage extends StatelessWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.filter_alt),
+            icon: const Icon(Icons.credit_card),
             onPressed: () => _showFilterOptions(context),
           ),
         ],

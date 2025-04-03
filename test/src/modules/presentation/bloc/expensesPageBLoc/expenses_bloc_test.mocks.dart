@@ -5,11 +5,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
 
-import 'package:dartz/dartz.dart' as _i2;
+import 'package:dartz/dartz.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i9;
 import 'package:onfly_viagens_app/src/core/core.dart' as _i5;
-import 'package:onfly_viagens_app/src/modules/domain/domain.dart' as _i3;
+import 'package:onfly_viagens_app/src/modules/domain/domain.dart' as _i2;
 import 'package:onfly_viagens_app/src/modules/domain/entity/travel_card_entity.dart'
     as _i10;
 import 'package:onfly_viagens_app/src/modules/domain/usecase/delete_travels_usescases.dart'
@@ -33,13 +33,19 @@ import 'package:onfly_viagens_app/src/modules/domain/usecase/save_travel_expense
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeEither_0<L, R> extends _i1.SmartFake implements _i2.Either<L, R> {
-  _FakeEither_0(Object parent, Invocation parentInvocation)
+class _FakeTravelExpensesRepository_0 extends _i1.SmartFake
+    implements _i2.TravelExpensesRepository {
+  _FakeTravelExpensesRepository_0(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
-class _FakeDateTime_1 extends _i1.SmartFake implements DateTime {
-  _FakeDateTime_1(Object parent, Invocation parentInvocation)
+class _FakeEither_1<L, R> extends _i1.SmartFake implements _i3.Either<L, R> {
+  _FakeEither_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeDateTime_2 extends _i1.SmartFake implements DateTime {
+  _FakeDateTime_2(Object parent, Invocation parentInvocation)
     : super(parent, parentInvocation);
 }
 
@@ -47,27 +53,38 @@ class _FakeDateTime_1 extends _i1.SmartFake implements DateTime {
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetTravelExpensesUseCase extends _i1.Mock
-    implements _i3.GetTravelExpensesUseCase {
+    implements _i2.GetTravelExpensesUseCase {
   MockGetTravelExpensesUseCase() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i3.TravelExpensesInfoEntity>> call([
+  _i2.TravelExpensesRepository get repository =>
+      (super.noSuchMethod(
+            Invocation.getter(#repository),
+            returnValue: _FakeTravelExpensesRepository_0(
+              this,
+              Invocation.getter(#repository),
+            ),
+          )
+          as _i2.TravelExpensesRepository);
+
+  @override
+  _i4.Future<_i3.Either<_i5.Failure, _i2.TravelExpensesInfoEntity>> call(
     _i5.NoParams? params,
-  ]) =>
+  ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
             returnValue: _i4.Future<
-              _i2.Either<_i5.Failure, _i3.TravelExpensesInfoEntity>
+              _i3.Either<_i5.Failure, _i2.TravelExpensesInfoEntity>
             >.value(
-              _FakeEither_0<_i5.Failure, _i3.TravelExpensesInfoEntity>(
+              _FakeEither_1<_i5.Failure, _i2.TravelExpensesInfoEntity>(
                 this,
                 Invocation.method(#call, [params]),
               ),
             ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i3.TravelExpensesInfoEntity>>);
+          as _i4.Future<_i3.Either<_i5.Failure, _i2.TravelExpensesInfoEntity>>);
 }
 
 /// A class which mocks [SaveTravelExpenseUseCase].
@@ -80,19 +97,19 @@ class MockSaveTravelExpenseUseCase extends _i1.Mock
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, int>> call(
-    _i3.TravelExpenseEntity? params,
+  _i4.Future<_i3.Either<_i5.Failure, int>> call(
+    _i2.TravelExpenseEntity? params,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
-            returnValue: _i4.Future<_i2.Either<_i5.Failure, int>>.value(
-              _FakeEither_0<_i5.Failure, int>(
+            returnValue: _i4.Future<_i3.Either<_i5.Failure, int>>.value(
+              _FakeEither_1<_i5.Failure, int>(
                 this,
                 Invocation.method(#call, [params]),
               ),
             ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, int>>);
+          as _i4.Future<_i3.Either<_i5.Failure, int>>);
 }
 
 /// A class which mocks [DeleteTravelExpenseUseCase].
@@ -105,17 +122,17 @@ class MockDeleteTravelExpenseUseCase extends _i1.Mock
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, int>> call(int? id) =>
+  _i4.Future<_i3.Either<_i5.Failure, int>> call(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#call, [id]),
-            returnValue: _i4.Future<_i2.Either<_i5.Failure, int>>.value(
-              _FakeEither_0<_i5.Failure, int>(
+            returnValue: _i4.Future<_i3.Either<_i5.Failure, int>>.value(
+              _FakeEither_1<_i5.Failure, int>(
                 this,
                 Invocation.method(#call, [id]),
               ),
             ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, int>>);
+          as _i4.Future<_i3.Either<_i5.Failure, int>>);
 }
 
 /// A class which mocks [GetTravelExpenseByIdUseCase].
@@ -128,26 +145,26 @@ class MockGetTravelExpenseByIdUseCase extends _i1.Mock
   }
 
   @override
-  _i4.Future<_i2.Either<_i5.Failure, _i3.TravelExpenseEntity?>> call(int? id) =>
+  _i4.Future<_i3.Either<_i5.Failure, _i2.TravelExpenseEntity?>> call(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#call, [id]),
             returnValue: _i4.Future<
-              _i2.Either<_i5.Failure, _i3.TravelExpenseEntity?>
+              _i3.Either<_i5.Failure, _i2.TravelExpenseEntity?>
             >.value(
-              _FakeEither_0<_i5.Failure, _i3.TravelExpenseEntity?>(
+              _FakeEither_1<_i5.Failure, _i2.TravelExpenseEntity?>(
                 this,
                 Invocation.method(#call, [id]),
               ),
             ),
           )
-          as _i4.Future<_i2.Either<_i5.Failure, _i3.TravelExpenseEntity?>>);
+          as _i4.Future<_i3.Either<_i5.Failure, _i2.TravelExpenseEntity?>>);
 }
 
 /// A class which mocks [TravelExpenseEntity].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockTravelExpenseEntity extends _i1.Mock
-    implements _i3.TravelExpenseEntity {
+    implements _i2.TravelExpenseEntity {
   MockTravelExpenseEntity() {
     _i1.throwOnMissingStub(this);
   }
@@ -160,7 +177,7 @@ class MockTravelExpenseEntity extends _i1.Mock
   DateTime get expenseDate =>
       (super.noSuchMethod(
             Invocation.getter(#expenseDate),
-            returnValue: _FakeDateTime_1(this, Invocation.getter(#expenseDate)),
+            returnValue: _FakeDateTime_2(this, Invocation.getter(#expenseDate)),
           )
           as DateTime);
 

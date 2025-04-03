@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../exports.dart';
+import 'expense_detail_modal_component.dart';
 
 class ExpenseSummary extends StatelessWidget {
   final List<TravelExpenseEntity> expenses;
@@ -28,7 +29,7 @@ class ExpenseSummary extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.blue.withAlpha((0.1 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -78,8 +79,30 @@ class ExpenseSummary extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => _showExpenseDetailModal(context),
+              icon: const Icon(Icons.analytics_outlined, size: 18),
+              label: const Text('Ver Relatorio'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              ),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  void _showExpenseDetailModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ExpenseDetailModal(expenses: expenses);
+      },
     );
   }
 }

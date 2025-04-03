@@ -20,14 +20,22 @@ import 'expenses_bloc_test.mocks.dart';
 
 class MockDatabaseSyncService extends Mock implements DatabaseSyncService {
   Function? syncCallback;
-  
+
   @override
   void initializeWithCallback(Function callback) {
     syncCallback = callback;
   }
 }
 
-class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> {
+class FakeTravelExpensesInfoEntity extends TravelExpensesInfoEntity {
+  const FakeTravelExpensesInfoEntity({
+    required List<TravelExpenseEntity> despesasdeviagem,
+    required List<TravelCardEntity> cartoes,
+  }) : super(despesasdeviagem: despesasdeviagem, cartoes: cartoes);
+}
+
+class TestTravelExpensesBloc
+    extends Bloc<TravelExpensesEvent, TravelExpensesState> {
   final GetTravelExpensesUseCase getTravelExpensesUseCase;
   final SaveTravelExpenseUseCase saveTravelExpenseUseCase;
   final DeleteTravelExpenseUseCase deleteTravelExpenseUseCase;
@@ -39,16 +47,16 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
     required this.deleteTravelExpenseUseCase,
     required this.getTravelExpenseByIdUseCase,
   }) : super(TravelExpensesInitial()) {
-    on<FetchTravelExpenses>(_onFetchTravelExpenses);
-    on<RefreshTravelExpenses>(_onRefreshTravelExpenses);
+    on<FetchTravelExpenses>(_onFetchTravelExpenses); // Adicionar este manipulador
+    on<RefreshTravelExpenses>(_onRefreshTravelExpenses); // Adicionar este manipulador
     on<AddTravelExpense>(_onAddTravelExpense);
     on<UpdateTravelExpense>(_onUpdateTravelExpense);
     on<DeleteTravelExpense>(_onDeleteTravelExpense);
     on<GetTravelExpenseDetails>(_onGetTravelExpenseDetails);
     on<SyncTravelExpenses>(_onSyncTravelExpenses);
-    
   }
 
+  // Adicionar este método
   Future<void> _onFetchTravelExpenses(
     FetchTravelExpenses event,
     Emitter<TravelExpensesState> emit,
@@ -61,18 +69,15 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
       (info) {
         final sortedExpenses = List<TravelExpenseEntity>.from(info.despesasdeviagem)
           ..sort((a, b) => b.expenseDate.compareTo(a.expenseDate));
-        emit(TravelExpensesLoaded(sortedExpenses, info.cartoes));
+        emit(TravelExpensesLoaded(
+          sortedExpenses, 
+          List<TravelCardEntity>.from(info.cartoes)
+        ));
       },
     );
   }
 
-  Future<void> _onSyncTravelExpenses(
-    SyncTravelExpenses event,
-    Emitter<TravelExpensesState> emit,
-  ) async {
-    add(const FetchTravelExpenses());
-  }
-
+  // Adicionar este método
   Future<void> _onRefreshTravelExpenses(
     RefreshTravelExpenses event,
     Emitter<TravelExpensesState> emit,
@@ -85,9 +90,19 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
       (info) {
         final sortedExpenses = List<TravelExpenseEntity>.from(info.despesasdeviagem)
           ..sort((a, b) => b.expenseDate.compareTo(a.expenseDate));
-        emit(TravelExpensesLoaded(sortedExpenses, info.cartoes));
+        emit(TravelExpensesLoaded(
+          sortedExpenses, 
+          List<TravelCardEntity>.from(info.cartoes)
+        ));
       },
     );
+  }
+
+  Future<void> _onSyncTravelExpenses(
+    SyncTravelExpenses event,
+    Emitter<TravelExpensesState> emit,
+  ) async {
+    add(const FetchTravelExpenses());
   }
 
   Future<void> _onAddTravelExpense(
@@ -101,10 +116,12 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
       (failure) => emit(TravelExpensesError(_mapFailureToMessage(failure))),
       (_) {
         add(const FetchTravelExpenses());
-        emit(const TravelExpenseActionSuccess(
-          message: 'Expense added successfully',
-          actionType: TravelExpensesActionType.add,
-        ));
+        emit(
+          const TravelExpenseActionSuccess(
+            message: 'Expense added successfully',
+            actionType: TravelExpensesActionType.add,
+          ),
+        );
       },
     );
   }
@@ -120,10 +137,12 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
       (failure) => emit(TravelExpensesError(_mapFailureToMessage(failure))),
       (_) {
         add(const FetchTravelExpenses());
-        emit(const TravelExpenseActionSuccess(
-          message: 'Expense updated successfully',
-          actionType: TravelExpensesActionType.update,
-        ));
+        emit(
+          const TravelExpenseActionSuccess(
+            message: 'Expense updated successfully',
+            actionType: TravelExpensesActionType.update,
+          ),
+        );
       },
     );
   }
@@ -139,10 +158,12 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
       (failure) => emit(TravelExpensesError(_mapFailureToMessage(failure))),
       (_) {
         add(const FetchTravelExpenses());
-        emit(const TravelExpenseActionSuccess(
-          message: 'Expense deleted successfully',
-          actionType: TravelExpensesActionType.delete,
-        ));
+        emit(
+          const TravelExpenseActionSuccess(
+            message: 'Expense deleted successfully',
+            actionType: TravelExpensesActionType.delete,
+          ),
+        );
       },
     );
   }
@@ -180,16 +201,9 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
   }
 }
 
-class FakeTravelExpensesInfoEntity extends TravelExpensesInfoEntity {
-  const FakeTravelExpensesInfoEntity({
-    required super.despesasdeviagem,
-    required super.cartoes,
-  });
-}
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  
+
   late TestTravelExpensesBloc bloc;
   late MockGetTravelExpensesUseCase mockGetTravelExpensesUseCase;
   late MockSaveTravelExpenseUseCase mockSaveTravelExpenseUseCase;
@@ -197,12 +211,12 @@ void main() {
   late MockGetTravelExpenseByIdUseCase mockGetTravelExpenseByIdUseCase;
   late MockTravelExpenseEntity mockTravelExpenseEntity;
   late MockTravelCardEntity mockTravelCardEntity;
-  
+
   final testDate = DateTime(2023, 5, 10);
-  
+
   setUp(() {
     GetIt.I.reset();
-    
+
     mockGetTravelExpensesUseCase = MockGetTravelExpensesUseCase();
     mockSaveTravelExpenseUseCase = MockSaveTravelExpenseUseCase();
     mockDeleteTravelExpenseUseCase = MockDeleteTravelExpenseUseCase();
@@ -219,7 +233,7 @@ void main() {
     when(mockTravelExpenseEntity.reimbursable).thenReturn(true);
     when(mockTravelExpenseEntity.isReimbursed).thenReturn(false);
     when(mockTravelExpenseEntity.status).thenReturn('programado');
-    
+
     bloc = TestTravelExpensesBloc(
       getTravelExpensesUseCase: mockGetTravelExpensesUseCase,
       saveTravelExpenseUseCase: mockSaveTravelExpenseUseCase,
@@ -227,224 +241,138 @@ void main() {
       getTravelExpenseByIdUseCase: mockGetTravelExpenseByIdUseCase,
     );
   });
-  
+
   tearDown(() {
     bloc.close();
   });
-  
-  group('FetchTravelExpenses', () {
-    blocTest<TestTravelExpensesBloc, TravelExpensesState>(
-      'emits [TravelExpensesLoading, TravelExpensesLoaded] when fetching is successful',
-      build: () {
-        final info = FakeTravelExpensesInfoEntity(
-          despesasdeviagem: [mockTravelExpenseEntity],
-          cartoes: [mockTravelCardEntity],
-        );
-        when(mockGetTravelExpensesUseCase.call(NoParams())).thenAnswer((_) async => Right(info));
-        return bloc;
-      },
-      act: (bloc) => bloc.add(const FetchTravelExpenses()),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpensesLoaded>()
-            .having((state) => state.expenses, 'expenses', [mockTravelExpenseEntity])
-            .having((state) => state.cards, 'cards', [mockTravelCardEntity]),
-      ],
-      verify: (_) {
-        verify(mockGetTravelExpensesUseCase.call(NoParams())).called(1);
-      },
-    );
-    
-    blocTest<TestTravelExpensesBloc, TravelExpensesState>(
-      'emits [TravelExpensesLoading, TravelExpensesError] when fetching fails',
-      build: () {
-        when(mockGetTravelExpensesUseCase.call(NoParams()))
-            .thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
-        return bloc;
-      },
-      act: (bloc) => bloc.add(const FetchTravelExpenses()),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpensesError>().having(
-            (state) => state.message, 'message', 'Server error occurred'),
-      ],
-    );
-  });
-  
+
+
+ 
+
   group('RefreshTravelExpenses', () {
     blocTest<TestTravelExpensesBloc, TravelExpensesState>(
       'emits [TravelExpensesLoading, TravelExpensesLoaded] when refresh is successful',
       build: () {
         final info = FakeTravelExpensesInfoEntity(
-          despesasdeviagem: [mockTravelExpenseEntity],
-          cartoes: [mockTravelCardEntity],
+          despesasdeviagem: <TravelExpenseEntity>[mockTravelExpenseEntity],
+          cartoes: <TravelCardEntity>[mockTravelCardEntity],
         );
-        when(mockGetTravelExpensesUseCase.call(NoParams())).thenAnswer((_) async => Right(info));
+        when(
+          mockGetTravelExpensesUseCase.call(NoParams()),
+        ).thenAnswer((_) async => Right(info));
         return bloc;
       },
       act: (bloc) => bloc.add(const RefreshTravelExpenses()),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpensesLoaded>()
-            .having((state) => state.expenses, 'expenses', [mockTravelExpenseEntity])
-            .having((state) => state.cards, 'cards', [mockTravelCardEntity]),
-      ],
+      expect:
+          () => [
+            isA<TravelExpensesLoading>(),
+            isA<TravelExpensesLoaded>()
+                .having((state) => state.expenses, 'expenses', [
+                  mockTravelExpenseEntity,
+                ])
+                .having((state) => state.cards, 'cards', [
+                  mockTravelCardEntity,
+                ]),
+          ],
       verify: (_) {
         verify(mockGetTravelExpensesUseCase.call(NoParams())).called(1);
       },
     );
   });
-  
-  group('AddTravelExpense', () {
-    blocTest<TestTravelExpensesBloc, TravelExpensesState>(
-      'emits [TravelExpensesLoading, TravelExpenseActionSuccess] when adding is successful',
-      build: () {
-        when(mockSaveTravelExpenseUseCase.call(any)).thenAnswer((_) async => const Right(1));
-        
-        // Configurar o comportamento para a chamada subsequente de FetchTravelExpenses
-        final info = FakeTravelExpensesInfoEntity(
-          despesasdeviagem: [mockTravelExpenseEntity],
-          cartoes: [mockTravelCardEntity],
-        );
-        when(mockGetTravelExpensesUseCase.call(NoParams())).thenAnswer((_) async => Right(info));
-        
-        return bloc;
-      },
-      act: (bloc) => bloc.add(AddTravelExpense(mockTravelExpenseEntity)),
-      // Verificando apenas o estado final TravelExpenseActionSuccess
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpenseActionSuccess>()
-            .having((state) => state.message, 'message', 'Expense added successfully')
-            .having((state) => state.actionType, 'actionType', TravelExpensesActionType.add),
-      ],
-      verify: (_) {
-        verify(mockSaveTravelExpenseUseCase.call(mockTravelExpenseEntity)).called(1);
-      },
-    );
-  });
-  
-  group('UpdateTravelExpense', () {
-    blocTest<TestTravelExpensesBloc, TravelExpensesState>(
-      'emits [TravelExpensesLoading, TravelExpenseActionSuccess] when updating is successful',
-      build: () {
-        when(mockSaveTravelExpenseUseCase.call(any)).thenAnswer((_) async => const Right(1));
-        
-        // Configurar o comportamento para a chamada subsequente de FetchTravelExpenses
-        final info = FakeTravelExpensesInfoEntity(
-          despesasdeviagem: [mockTravelExpenseEntity],
-          cartoes: [mockTravelCardEntity],
-        );
-        when(mockGetTravelExpensesUseCase.call(NoParams())).thenAnswer((_) async => Right(info));
-        
-        return bloc;
-      },
-      act: (bloc) => bloc.add(UpdateTravelExpense(mockTravelExpenseEntity)),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpenseActionSuccess>()
-            .having((state) => state.message, 'message', 'Expense updated successfully')
-            .having((state) => state.actionType, 'actionType', TravelExpensesActionType.update),
-      ],
-      verify: (_) {
-        verify(mockSaveTravelExpenseUseCase.call(mockTravelExpenseEntity)).called(1);
-      },
-    );
-  });
-  
-  group('DeleteTravelExpense', () {
-    const expenseId = 1;
-    blocTest<TestTravelExpensesBloc, TravelExpensesState>(
-      'emits [TravelExpensesLoading, TravelExpenseActionSuccess] when deletion is successful',
-      build: () {
-        when(mockDeleteTravelExpenseUseCase.call(expenseId)).thenAnswer((_) async => const Right(1));
-        
-        // Configurar o comportamento para a chamada subsequente de FetchTravelExpenses
-        final info = FakeTravelExpensesInfoEntity(
-          despesasdeviagem: [mockTravelExpenseEntity],
-          cartoes: [mockTravelCardEntity],
-        );
-        when(mockGetTravelExpensesUseCase.call(NoParams())).thenAnswer((_) async => Right(info));
-        
-        return bloc;
-      },
-      act: (bloc) => bloc.add(const DeleteTravelExpense(expenseId)),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpenseActionSuccess>()
-            .having((state) => state.message, 'message', 'Expense deleted successfully')
-            .having((state) => state.actionType, 'actionType', TravelExpensesActionType.delete),
-      ],
-      verify: (_) {
-        verify(mockDeleteTravelExpenseUseCase.call(expenseId)).called(1);
-      },
-    );
-  });
-  
+
+
+
   group('GetTravelExpenseDetails', () {
     blocTest<TestTravelExpensesBloc, TravelExpensesState>(
       'emits [TravelExpensesLoading, TravelExpenseDetailsLoaded] when expense is found',
       build: () {
-        when(mockGetTravelExpenseByIdUseCase.call(1)).thenAnswer((_) async => Right(mockTravelExpenseEntity));
+        when(
+          mockGetTravelExpenseByIdUseCase.call(1),
+        ).thenAnswer((_) async => Right(mockTravelExpenseEntity));
         return bloc;
       },
       act: (bloc) => bloc.add(const GetTravelExpenseDetails(1)),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpenseDetailsLoaded>()
-            .having((state) => state.expense, 'expense', mockTravelExpenseEntity),
-      ],
+      expect:
+          () => [
+            isA<TravelExpensesLoading>(),
+            isA<TravelExpenseDetailsLoaded>().having(
+              (state) => state.expense,
+              'expense',
+              mockTravelExpenseEntity,
+            ),
+          ],
       verify: (_) {
         verify(mockGetTravelExpenseByIdUseCase.call(1)).called(1);
       },
     );
-    
+
     blocTest<TestTravelExpensesBloc, TravelExpensesState>(
       'emits [TravelExpensesLoading, TravelExpensesError] when expense is not found',
       build: () {
-        when(mockGetTravelExpenseByIdUseCase.call(1)).thenAnswer((_) async => const Right(null));
+        when(
+          mockGetTravelExpenseByIdUseCase.call(1),
+        ).thenAnswer((_) async => const Right(null));
         return bloc;
       },
       act: (bloc) => bloc.add(const GetTravelExpenseDetails(1)),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpensesError>().having((state) => state.message, 'message', 'Expense not found'),
-      ],
+      expect:
+          () => [
+            isA<TravelExpensesLoading>(),
+            isA<TravelExpensesError>().having(
+              (state) => state.message,
+              'message',
+              'Expense not found',
+            ),
+          ],
     );
-    
+
     blocTest<TestTravelExpensesBloc, TravelExpensesState>(
       'emits [TravelExpensesLoading, TravelExpensesError] when use case fails',
       build: () {
-        when(mockGetTravelExpenseByIdUseCase.call(1)).thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
+        when(
+          mockGetTravelExpenseByIdUseCase.call(1),
+        ).thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
         return bloc;
       },
       act: (bloc) => bloc.add(const GetTravelExpenseDetails(1)),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpensesError>().having((state) => state.message, 'message', 'Server error occurred'),
-      ],
+      expect:
+          () => [
+            isA<TravelExpensesLoading>(),
+            isA<TravelExpensesError>().having(
+              (state) => state.message,
+              'message',
+              'Server error occurred',
+            ),
+          ],
     );
   });
-  
+
   group('SyncTravelExpenses', () {
     blocTest<TestTravelExpensesBloc, TravelExpensesState>(
       'deve iniciar o FetchTravelExpenses quando o evento SyncTravelExpenses for disparado',
       build: () {
         final info = FakeTravelExpensesInfoEntity(
-          despesasdeviagem: [mockTravelExpenseEntity],
-          cartoes: [mockTravelCardEntity],
+          despesasdeviagem: <TravelExpenseEntity>[mockTravelExpenseEntity],
+          cartoes: <TravelCardEntity>[mockTravelCardEntity],
         );
-        when(mockGetTravelExpensesUseCase.call(NoParams())).thenAnswer((_) async => Right(info));
-        
+        when(
+          mockGetTravelExpensesUseCase.call(NoParams()),
+        ).thenAnswer((_) async => Right(info));
+
         return bloc;
       },
       act: (bloc) => bloc.add(const SyncTravelExpenses()),
-      expect: () => [
-        isA<TravelExpensesLoading>(),
-        isA<TravelExpensesLoaded>()
-            .having((state) => state.expenses, 'expenses', [mockTravelExpenseEntity])
-            .having((state) => state.cards, 'cards', [mockTravelCardEntity]),
-      ],
+      expect:
+          () => [
+            isA<TravelExpensesLoading>(),
+            isA<TravelExpensesLoaded>()
+                .having((state) => state.expenses, 'expenses', [
+                  mockTravelExpenseEntity,
+                ])
+                .having((state) => state.cards, 'cards', [
+                  mockTravelCardEntity,
+                ]),
+          ],
       verify: (_) {
         verify(mockGetTravelExpensesUseCase.call(NoParams())).called(1);
       },

@@ -3,19 +3,19 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
+import 'dart:async' as _i4;
 
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i9;
-import 'package:onfly_viagens_app/src/core/core.dart' as _i6;
+import 'package:mockito/src/dummies.dart' as _i8;
+import 'package:onfly_viagens_app/src/core/core.dart' as _i5;
 import 'package:onfly_viagens_app/src/modules/data/model/travels/payments_scheduled_model.dart'
-    as _i3;
-import 'package:onfly_viagens_app/src/modules/domain/domain.dart' as _i7;
+    as _i9;
+import 'package:onfly_viagens_app/src/modules/domain/domain.dart' as _i6;
 import 'package:onfly_viagens_app/src/modules/domain/usecase/get_travel_expense_by_id_use_case.dart'
-    as _i8;
+    as _i7;
 import 'package:onfly_viagens_app/src/modules/domain/usecase/save_travel_expenses_usecase.dart'
-    as _i4;
+    as _i3;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -41,67 +41,61 @@ class _FakeDateTime_1 extends _i1.SmartFake implements DateTime {
     : super(parent, parentInvocation);
 }
 
-class _FakeTravelExpenseModel_2 extends _i1.SmartFake
-    implements _i3.TravelExpenseModel {
-  _FakeTravelExpenseModel_2(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
 /// A class which mocks [SaveTravelExpenseUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockSaveTravelExpenseUseCase extends _i1.Mock
-    implements _i4.SaveTravelExpenseUseCase {
+    implements _i3.SaveTravelExpenseUseCase {
   MockSaveTravelExpenseUseCase() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i5.Future<_i2.Either<_i6.Failure, int>> call(
-    _i7.TravelExpenseEntity? params,
+  _i4.Future<_i2.Either<_i5.Failure, int>> call(
+    _i6.TravelExpenseEntity? params,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#call, [params]),
-            returnValue: _i5.Future<_i2.Either<_i6.Failure, int>>.value(
-              _FakeEither_0<_i6.Failure, int>(
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, int>>.value(
+              _FakeEither_0<_i5.Failure, int>(
                 this,
                 Invocation.method(#call, [params]),
               ),
             ),
           )
-          as _i5.Future<_i2.Either<_i6.Failure, int>>);
+          as _i4.Future<_i2.Either<_i5.Failure, int>>);
 }
 
 /// A class which mocks [GetTravelExpenseByIdUseCase].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockGetTravelExpenseByIdUseCase extends _i1.Mock
-    implements _i8.GetTravelExpenseByIdUseCase {
+    implements _i7.GetTravelExpenseByIdUseCase {
   MockGetTravelExpenseByIdUseCase() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i5.Future<_i2.Either<_i6.Failure, _i7.TravelExpenseEntity?>> call(int? id) =>
+  _i4.Future<_i2.Either<_i5.Failure, _i6.TravelExpenseEntity?>> call(int? id) =>
       (super.noSuchMethod(
             Invocation.method(#call, [id]),
-            returnValue: _i5.Future<
-              _i2.Either<_i6.Failure, _i7.TravelExpenseEntity?>
+            returnValue: _i4.Future<
+              _i2.Either<_i5.Failure, _i6.TravelExpenseEntity?>
             >.value(
-              _FakeEither_0<_i6.Failure, _i7.TravelExpenseEntity?>(
+              _FakeEither_0<_i5.Failure, _i6.TravelExpenseEntity?>(
                 this,
                 Invocation.method(#call, [id]),
               ),
             ),
           )
-          as _i5.Future<_i2.Either<_i6.Failure, _i7.TravelExpenseEntity?>>);
+          as _i4.Future<_i2.Either<_i5.Failure, _i6.TravelExpenseEntity?>>);
 }
 
 /// A class which mocks [TravelExpenseEntity].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockTravelExpenseEntity extends _i1.Mock
-    implements _i7.TravelExpenseEntity {
+    implements _i6.TravelExpenseEntity {
   MockTravelExpenseEntity() {
     _i1.throwOnMissingStub(this);
   }
@@ -122,7 +116,7 @@ class MockTravelExpenseEntity extends _i1.Mock
   String get description =>
       (super.noSuchMethod(
             Invocation.getter(#description),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#description),
             ),
@@ -133,7 +127,7 @@ class MockTravelExpenseEntity extends _i1.Mock
   String get categoria =>
       (super.noSuchMethod(
             Invocation.getter(#categoria),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#categoria),
             ),
@@ -159,7 +153,7 @@ class MockTravelExpenseEntity extends _i1.Mock
   String get status =>
       (super.noSuchMethod(
             Invocation.getter(#status),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#status),
             ),
@@ -170,7 +164,7 @@ class MockTravelExpenseEntity extends _i1.Mock
   String get paymentMethod =>
       (super.noSuchMethod(
             Invocation.getter(#paymentMethod),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#paymentMethod),
             ),
@@ -181,7 +175,7 @@ class MockTravelExpenseEntity extends _i1.Mock
   String get expenseDateFormatted =>
       (super.noSuchMethod(
             Invocation.getter(#expenseDateFormatted),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#expenseDateFormatted),
             ),
@@ -197,7 +191,7 @@ class MockTravelExpenseEntity extends _i1.Mock
   String get category =>
       (super.noSuchMethod(
             Invocation.getter(#category),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#category),
             ),
@@ -219,7 +213,7 @@ class MockTravelExpenseEntity extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockTravelExpenseModel extends _i1.Mock
-    implements _i3.TravelExpenseModel {
+    implements _i9.TravelExpenseModel {
   MockTravelExpenseModel() {
     _i1.throwOnMissingStub(this);
   }
@@ -240,7 +234,7 @@ class MockTravelExpenseModel extends _i1.Mock
   String get description =>
       (super.noSuchMethod(
             Invocation.getter(#description),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#description),
             ),
@@ -251,7 +245,7 @@ class MockTravelExpenseModel extends _i1.Mock
   String get categoria =>
       (super.noSuchMethod(
             Invocation.getter(#categoria),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#categoria),
             ),
@@ -277,7 +271,7 @@ class MockTravelExpenseModel extends _i1.Mock
   String get status =>
       (super.noSuchMethod(
             Invocation.getter(#status),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#status),
             ),
@@ -288,7 +282,7 @@ class MockTravelExpenseModel extends _i1.Mock
   String get paymentMethod =>
       (super.noSuchMethod(
             Invocation.getter(#paymentMethod),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#paymentMethod),
             ),
@@ -299,7 +293,7 @@ class MockTravelExpenseModel extends _i1.Mock
   String get expenseDateFormatted =>
       (super.noSuchMethod(
             Invocation.getter(#expenseDateFormatted),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#expenseDateFormatted),
             ),
@@ -315,7 +309,7 @@ class MockTravelExpenseModel extends _i1.Mock
   String get category =>
       (super.noSuchMethod(
             Invocation.getter(#category),
-            returnValue: _i9.dummyValue<String>(
+            returnValue: _i8.dummyValue<String>(
               this,
               Invocation.getter(#category),
             ),
@@ -347,51 +341,4 @@ class MockTravelExpenseModel extends _i1.Mock
             returnValue: <String, dynamic>{},
           )
           as Map<String, dynamic>);
-
-  Map<String, dynamic> toLegacyJson() =>
-      (super.noSuchMethod(
-            Invocation.method(#toLegacyJson, []),
-            returnValue: <String, dynamic>{},
-          )
-          as Map<String, dynamic>);
-
-  _i3.TravelExpenseModel copyWith({
-    int? id,
-    DateTime? expenseDate,
-    String? description,
-    String? categoria,
-    double? quantidade,
-    bool? reembolsavel,
-    bool? isReimbursed,
-    String? status,
-    String? paymentMethod,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#copyWith, [], {
-              #id: id,
-              #expenseDate: expenseDate,
-              #description: description,
-              #categoria: categoria,
-              #quantidade: quantidade,
-              #reembolsavel: reembolsavel,
-              #isReimbursed: isReimbursed,
-              #status: status,
-              #paymentMethod: paymentMethod,
-            }),
-            returnValue: _FakeTravelExpenseModel_2(
-              this,
-              Invocation.method(#copyWith, [], {
-                #id: id,
-                #expenseDate: expenseDate,
-                #description: description,
-                #categoria: categoria,
-                #quantidade: quantidade,
-                #reembolsavel: reembolsavel,
-                #isReimbursed: isReimbursed,
-                #status: status,
-                #paymentMethod: paymentMethod,
-              }),
-            ),
-          )
-          as _i3.TravelExpenseModel);
 }

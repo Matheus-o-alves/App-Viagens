@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../modules/data/model/travels/payments.dart';
@@ -15,9 +14,9 @@ class DatabaseSyncService {
   final TravelExpensesLocalDataSource _localDataSource;
   final TravelExpensesRemoteDataSource _remoteDataSource;
   final Connectivity _connectivity;
-  
+
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
-  
+
   Function? onSyncComplete;
   bool _isSyncing = false;
   bool _isInitialized = false;
@@ -29,28 +28,22 @@ class DatabaseSyncService {
     required TravelExpensesRemoteDataSource remoteDataSource,
     required Connectivity connectivity,
     this.onSyncComplete,
-  }) : 
-    _localDataSource = localDataSource,
-    _remoteDataSource = remoteDataSource,
-    _connectivity = connectivity;
+  })  : _localDataSource = localDataSource,
+        _remoteDataSource = remoteDataSource,
+        _connectivity = connectivity;
 
   void initialize() {
     if (_isInitialized) {
-      debugPrint('DatabaseSyncService: Já inicializado');
       return;
     }
 
-    debugPrint('DatabaseSyncService: Inicializando...');
-    
     _checkAndSync();
-    
+
     _connectivitySubscription ??= _connectivity.onConnectivityChanged.listen(
-        (_) => _checkAndSync(),
-        onError: (error) {
-          debugPrint('DatabaseSyncService: Erro de conectividade: $error');
-        },
-        cancelOnError: false,
-      );
+      (_) => _checkAndSync(),
+      onError: (error) {},
+      cancelOnError: false,
+    );
 
     _isInitialized = true;
   }
@@ -63,85 +56,42 @@ class DatabaseSyncService {
   Future<void> _checkAndSync() async {
     try {
       final results = await _connectivity.checkConnectivity();
-      debugPrint('DatabaseSyncService: Status de conectividade: $results');
-      
+
       if (results.any((r) => r != ConnectivityResult.none)) {
         await syncData();
-      } else {
-        debugPrint('DatabaseSyncService: Sem conexão disponível.');
       }
-    } catch (e) {
-      debugPrint('DatabaseSyncService: Erro ao verificar conectividade: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> syncData() async {
     if (_isSyncing) {
-      debugPrint(
-        'DatabaseSyncService: Sincronização ignorada (já em andamento)',
-      );
       return;
     }
 
     _isSyncing = true;
     try {
-      debugPrint('DatabaseSyncService: Iniciando sincronização...');
-      
       final remoteExpensesInfo = await _remoteDataSource.getTravelExpensesInfo();
-      
-      debugPrint('DatabaseSyncService: Dados obtidos da API:');
-      debugPrint('- Despesas: ${remoteExpensesInfo.despesasdeviagem.length}');
-      debugPrint('- Cartões: ${remoteExpensesInfo.cartoes.length}');
 
       final syncData = _convertEntityToSyncData(remoteExpensesInfo);
-      debugPrint('DatabaseSyncService: Dados convertidos para sincronização');
 
       await _localDataSource.syncWithRemote(syncData);
-      debugPrint('DatabaseSyncService: Sincronização concluída com sucesso');
 
       _notifyBlocToRefresh();
 
-      for (var e in remoteExpensesInfo.despesasdeviagem) {
-        final data = _getExpenseData(e);
-        debugPrint('🧾 $data');
-      }
-
       onSyncComplete?.call();
-    } catch (e, stackTrace) {
-      debugPrint('DatabaseSyncService: Erro durante a sincronização: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (_) {
     } finally {
       _isSyncing = false;
     }
   }
 
-  Map<String, dynamic> _getExpenseData(dynamic expense) {
-    return expense is TravelExpenseModel
-        ? expense.toDatabaseMap()
-        : {
-            'id': expense.id,
-            'expenseDate': expense.expenseDate.toIso8601String(),
-            'description': expense.description,
-            'categoria': expense.categoria,
-            'quantidade': expense.quantidade,
-            'reembolsavel': expense.reembolsavel,
-            'isReimbursed': expense.isReimbursed,
-            'status': expense.status,
-            'paymentMethod': expense.paymentMethod,
-          };
-  }
 
   void _notifyBlocToRefresh() {
     try {
       if (_sl.isRegistered<TravelExpensesBloc>()) {
-        debugPrint('DatabaseSyncService: Notificando TravelExpensesBloc');
         _sl<TravelExpensesBloc>().add(const FetchTravelExpenses());
-      } else {
-        debugPrint('DatabaseSyncService: TravelExpensesBloc não registrado');
       }
-    } catch (e) {
-      debugPrint('Erro ao notificar TravelExpensesBloc: $e');
-    }
+    } catch (_) {}
   }
 
   Map<String, dynamic> _convertEntityToSyncData(
@@ -149,10 +99,6 @@ class DatabaseSyncService {
   ) {
     final despesas = _convertExpenses(entity.despesasdeviagem);
     final cartoes = _convertCards(entity.cartoes);
-
-    debugPrint(
-      'Convertidos ${despesas.length} despesas e ${cartoes.length} cartões',
-    );
 
     return {'despesasdeviagem': despesas, 'cartoes': cartoes};
   }
@@ -174,8 +120,7 @@ class DatabaseSyncService {
                     'status': e.status,
                     'paymentMethod': e.paymentMethod,
                   };
-          } catch (ex) {
-            debugPrint('Erro ao converter despesa: $ex');
+          } catch (_) {
             return {};
           }
         })
@@ -198,8 +143,7 @@ class DatabaseSyncService {
                     'bandeira': e.bandeira,
                     'limiteDisponivel': e.limiteDisponivel,
                   };
-          } catch (ex) {
-            debugPrint('Erro ao converter cartão: $ex');
+          } catch (_) {
             return {};
           }
         })
@@ -211,8 +155,7 @@ class DatabaseSyncService {
     try {
       await syncData();
       return true;
-    } catch (e) {
-      debugPrint('Falha na sincronização forçada: $e');
+    } catch (_) {
       return false;
     }
   }

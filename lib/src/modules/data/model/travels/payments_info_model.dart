@@ -1,9 +1,5 @@
-
 import '../../../../exports.dart';
 import 'travel_card_model.dart';
-
-
-import 'package:flutter/material.dart';
 
 class TravelExpensesInfoModel extends TravelExpensesInfoEntity {
   const TravelExpensesInfoModel({
@@ -12,41 +8,27 @@ class TravelExpensesInfoModel extends TravelExpensesInfoEntity {
   });
 
   factory TravelExpensesInfoModel.fromJson(Map<String, dynamic> json) {
-    debugPrint('🔎 Convertendo TravelExpensesInfoModel.fromJson: ${json.keys}');
-    
     List<TravelExpenseModel> despesas = [];
     List<TravelCardModel> cartoes = [];
 
-    // Converte despesas
     if (json.containsKey('travelExpenses')) {
-      debugPrint('📋 Convertendo despesas de travelExpenses');
       despesas = _convertDespesas(json['travelExpenses']);
     } else if (json.containsKey('despesasdeviagem')) {
-      debugPrint('📋 Convertendo despesas de despesasdeviagem');
       despesas = _convertDespesas(json['despesasdeviagem']);
-    } else {
-      debugPrint('⚠️ Nenhuma chave de despesas encontrada no JSON');
     }
 
-    // Converte cartões
     if (json.containsKey('cards')) {
-      debugPrint('💳 Convertendo cartões de cards');
       cartoes = _convertCartoes(json['cards']);
     } else if (json.containsKey('cartoes')) {
-      debugPrint('💳 Convertendo cartões de cartoes');
       cartoes = _convertCartoes(json['cartoes']);
-    } else {
-      debugPrint('⚠️ Nenhuma chave de cartões encontrada no JSON');
     }
 
-    debugPrint('✅ Conversão concluída: ${despesas.length} despesas, ${cartoes.length} cartões');
     return TravelExpensesInfoModel(
       despesasdeviagem: despesas,
       cartoes: cartoes,
     );
   }
 
-  // Método auxiliar para converter lista de despesas
   static List<TravelExpenseModel> _convertDespesas(List<dynamic> list) {
     return list.map((item) {
       try {
@@ -55,9 +37,6 @@ class TravelExpensesInfoModel extends TravelExpensesInfoEntity {
         }
         return TravelExpenseModel.fromJson(item);
       } catch (e) {
-        debugPrint('❌ Erro ao converter despesa: $e');
-        debugPrint('💾 Dados da despesa: $item');
-        // Retorna um modelo vazio em caso de erro
         return TravelExpenseModel(
           id: 0,
           expenseDate: DateTime.now(),
@@ -73,19 +52,14 @@ class TravelExpensesInfoModel extends TravelExpensesInfoEntity {
     }).toList();
   }
 
-  // Método auxiliar para converter lista de cartões
   static List<TravelCardModel> _convertCartoes(List<dynamic> list) {
     return list.map((item) {
       try {
         if (item is TravelCardModel) {
           return item;
         }
-        debugPrint('🔄 Convertendo cartão: $item');
         return TravelCardModel.fromJson(item);
       } catch (e) {
-        debugPrint('❌ Erro ao converter cartão: $e');
-        debugPrint('💾 Dados do cartão: $item');
-        // Retorna um modelo vazio em caso de erro
         return const TravelCardModel(
           id: 0,
           nome: 'Erro de conversão',

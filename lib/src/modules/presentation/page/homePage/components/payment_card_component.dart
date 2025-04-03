@@ -56,7 +56,7 @@ class ExpenseCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.2),
+                    color: statusColor.withAlpha((0.1 * 255).round()),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -123,7 +123,8 @@ class ExpenseCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
+                      color: Colors.blue.withAlpha((0.1 * 255).round())
+,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(

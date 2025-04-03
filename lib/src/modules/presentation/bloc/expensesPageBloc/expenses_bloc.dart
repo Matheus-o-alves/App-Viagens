@@ -35,7 +35,6 @@ class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> 
 
     final syncService = GetIt.instance<DatabaseSyncService>();
     syncService.initializeWithCallback(() {
-      debugPrint('📦 Callback do DatabaseSyncService chamado!');
       add(const FetchTravelExpenses());
     });
   }
@@ -50,21 +49,16 @@ class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> 
     result.fold(
       (failure) => emit(TravelExpensesError(_mapFailureToMessage(failure))),
       (info) {
-        // Filtrar e converter para os tipos corretos
         final expensesList = info.despesasdeviagem
-            .where((e) => e is TravelExpenseEntity)
+            .whereType<TravelExpenseEntity>()
             .cast<TravelExpenseEntity>()
             .toList();
-        
+
         final cardsList = info.cartoes
-            .where((c) => c is TravelCardEntity)
+            .whereType<TravelCardEntity>()
             .cast<TravelCardEntity>()
             .toList();
-        
-        debugPrint('🔍 Despesas carregadas: ${expensesList.length}');
-        debugPrint('💳 Cartões carregados: ${cardsList.length}');
-        
-        // Ordenar despesas por data
+
         expensesList.sort((a, b) => b.expenseDate.compareTo(a.expenseDate));
         emit(TravelExpensesLoaded(expensesList, cardsList));
       },
@@ -88,18 +82,16 @@ class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> 
     result.fold(
       (failure) => emit(TravelExpensesError(_mapFailureToMessage(failure))),
       (info) {
-        // Filtrar e converter para os tipos corretos
         final expensesList = info.despesasdeviagem
-            .where((e) => e is TravelExpenseEntity)
+            .whereType<TravelExpenseEntity>()
             .cast<TravelExpenseEntity>()
             .toList();
-        
+
         final cardsList = info.cartoes
-            .where((c) => c is TravelCardEntity)
+            .whereType<TravelCardEntity>()
             .cast<TravelCardEntity>()
             .toList();
-        
-        // Ordenar despesas por data
+
         expensesList.sort((a, b) => b.expenseDate.compareTo(a.expenseDate));
         emit(TravelExpensesLoaded(expensesList, cardsList));
       },

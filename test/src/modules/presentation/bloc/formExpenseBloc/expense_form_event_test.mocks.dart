@@ -27,12 +27,6 @@ class _FakeDateTime_0 extends _i1.SmartFake implements DateTime {
     : super(parent, parentInvocation);
 }
 
-class _FakeTravelExpenseModel_1 extends _i1.SmartFake
-    implements _i2.TravelExpenseModel {
-  _FakeTravelExpenseModel_1(Object parent, Invocation parentInvocation)
-    : super(parent, parentInvocation);
-}
-
 /// A class which mocks [TravelExpenseModel].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -165,51 +159,4 @@ class MockTravelExpenseModel extends _i1.Mock
             returnValue: <String, dynamic>{},
           )
           as Map<String, dynamic>);
-
-  Map<String, dynamic> toLegacyJson() =>
-      (super.noSuchMethod(
-            Invocation.method(#toLegacyJson, []),
-            returnValue: <String, dynamic>{},
-          )
-          as Map<String, dynamic>);
-
-  _i2.TravelExpenseModel copyWith({
-    int? id,
-    DateTime? expenseDate,
-    String? description,
-    String? categoria,
-    double? quantidade,
-    bool? reembolsavel,
-    bool? isReimbursed,
-    String? status,
-    String? paymentMethod,
-  }) =>
-      (super.noSuchMethod(
-            Invocation.method(#copyWith, [], {
-              #id: id,
-              #expenseDate: expenseDate,
-              #description: description,
-              #categoria: categoria,
-              #quantidade: quantidade,
-              #reembolsavel: reembolsavel,
-              #isReimbursed: isReimbursed,
-              #status: status,
-              #paymentMethod: paymentMethod,
-            }),
-            returnValue: _FakeTravelExpenseModel_1(
-              this,
-              Invocation.method(#copyWith, [], {
-                #id: id,
-                #expenseDate: expenseDate,
-                #description: description,
-                #categoria: categoria,
-                #quantidade: quantidade,
-                #reembolsavel: reembolsavel,
-                #isReimbursed: isReimbursed,
-                #status: status,
-                #paymentMethod: paymentMethod,
-              }),
-            ),
-          )
-          as _i2.TravelExpenseModel);
 }
