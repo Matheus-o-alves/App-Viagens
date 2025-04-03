@@ -1,16 +1,14 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../../../../core/core.dart';
 import '../../../../../exports.dart';
-import '../../../../domain/domain.dart';
+
 
 class ExpenseCard extends StatelessWidget {
   final TravelExpenseEntity expense;
   final currencyFormatter = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
-  ExpenseCard({Key? key, required this.expense}) : super(key: key);
+  ExpenseCard({super.key, required this.expense});
 
   @override
   Widget build(BuildContext context) {

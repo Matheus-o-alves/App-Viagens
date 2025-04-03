@@ -4,10 +4,9 @@ import '../../../../exports.dart';
 import '../../bloc/loginBloc/login_bloc.dart';
 import '../../bloc/loginBloc/login_event.dart';
 import '../../bloc/loginBloc/login_state.dart';
-import '../homePage/travel_expenses_page.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class LoginScreen extends StatelessWidget {
 }
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
+  const LoginForm({super.key});
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -38,7 +37,6 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     super.initState();
-    // Atualiza o BLoC quando o texto dos campos muda
     _emailController.addListener(_onEmailChanged);
     _passwordController.addListener(_onPasswordChanged);
   }
@@ -62,7 +60,6 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     return BlocConsumer<LoginBloc, LoginState>(
       listenWhen: (previous, current) {
-        // Só escuta mudanças relevantes para navegação ou mensagens
         return current is LoginSuccess || 
                current is LoginFailure || 
                current is LoginValidationError;
@@ -76,7 +73,6 @@ class _LoginFormState extends State<LoginForm> {
         }
       },
       buildWhen: (previous, current) {
-        // Reconstruir apenas para estados que afetam a UI
         return current is LoginInitial || 
                current is LoginLoading || 
                current is LoginFormState || 
@@ -122,7 +118,6 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Widget _buildEmailField(BuildContext context, LoginState state) {
-    // Obter o erro de email do estado
     String? emailError;
     if (state is LoginFormState) {
       emailError = state.emailError;
@@ -143,7 +138,6 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Widget _buildPasswordField(BuildContext context, LoginState state) {
-    // Obter o erro de senha do estado
     String? passwordError;
     if (state is LoginFormState) {
       passwordError = state.passwordError;
@@ -164,17 +158,13 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   Widget _buildLoginButton(BuildContext context, LoginState state) {
-    // Verificar se o formulário é válido
-    bool isFormValid = false;
     if (state is LoginFormState) {
-      isFormValid = state.isFormValid;
     }
 
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          // Envia o evento de login para o BLoC
           context.read<LoginBloc>().add(
             LoginSubmitted(
               email: _emailController.text,

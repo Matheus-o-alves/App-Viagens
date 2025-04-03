@@ -1,7 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
@@ -9,8 +7,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:onfly_viagens_app/src/exports.dart';
 import 'package:onfly_viagens_app/src/modules/domain/entity/travel_card_entity.dart';
-import 'package:onfly_viagens_app/src/modules/infra/datasource/travel_expenses_local_data_source.dart';
-import 'package:onfly_viagens_app/src/modules/infra/datasource/travel_expenses_remote_data_source.dart';
 
 @GenerateMocks([
   GetTravelExpensesUseCase,
@@ -22,7 +18,6 @@ import 'package:onfly_viagens_app/src/modules/infra/datasource/travel_expenses_r
 ])
 import 'expenses_bloc_test.mocks.dart';
 
-// Mock personalizado para o DatabaseSyncService - para evitar problemas com initializeWithCallback
 class MockDatabaseSyncService extends Mock implements DatabaseSyncService {
   Function? syncCallback;
   
@@ -32,8 +27,6 @@ class MockDatabaseSyncService extends Mock implements DatabaseSyncService {
   }
 }
 
-// Esta é uma versão modificada do TravelExpensesBloc para testes
-// que sobrescreve o construtor para evitar chamadas a GetIt
 class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> {
   final GetTravelExpensesUseCase getTravelExpensesUseCase;
   final SaveTravelExpenseUseCase saveTravelExpenseUseCase;
@@ -54,7 +47,6 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
     on<GetTravelExpenseDetails>(_onGetTravelExpenseDetails);
     on<SyncTravelExpenses>(_onSyncTravelExpenses);
     
-    // Não chamamos o GetIt.instance aqui - diferente da implementação original
   }
 
   Future<void> _onFetchTravelExpenses(
@@ -176,11 +168,11 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
-      case ServerFailure:
+      case const (ServerFailure):
         return 'Server error occurred';
-      case ConnectionFailure:
+      case const (ConnectionFailure):
         return 'No internet connection';
-      case DatabaseFailure:
+      case const (DatabaseFailure):
         return 'Database error: ${failure.message}';
       default:
         return 'An unexpected error occurred';
@@ -188,12 +180,11 @@ class TestTravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesSta
   }
 }
 
-/// Criação de uma implementação fake para TravelExpensesInfoEntity
 class FakeTravelExpensesInfoEntity extends TravelExpensesInfoEntity {
   const FakeTravelExpensesInfoEntity({
-    required List<TravelExpenseEntity> despesasdeviagem,
-    required List<TravelCardEntity> cartoes,
-  }) : super(despesasdeviagem: despesasdeviagem, cartoes: cartoes);
+    required super.despesasdeviagem,
+    required super.cartoes,
+  });
 }
 
 void main() {
@@ -210,10 +201,8 @@ void main() {
   final testDate = DateTime(2023, 5, 10);
   
   setUp(() {
-    // Limpar o GetIt para garantir que não haja dependências de testes anteriores
     GetIt.I.reset();
     
-    // Criar novos mocks para cada teste
     mockGetTravelExpensesUseCase = MockGetTravelExpensesUseCase();
     mockSaveTravelExpenseUseCase = MockSaveTravelExpenseUseCase();
     mockDeleteTravelExpenseUseCase = MockDeleteTravelExpenseUseCase();
@@ -221,7 +210,6 @@ void main() {
     mockTravelExpenseEntity = MockTravelExpenseEntity();
     mockTravelCardEntity = MockTravelCardEntity();
 
-    // Configurar os getters do mock da despesa
     when(mockTravelExpenseEntity.id).thenReturn(1);
     when(mockTravelExpenseEntity.expenseDate).thenReturn(testDate);
     when(mockTravelExpenseEntity.description).thenReturn('Test expense');
@@ -232,7 +220,6 @@ void main() {
     when(mockTravelExpenseEntity.isReimbursed).thenReturn(false);
     when(mockTravelExpenseEntity.status).thenReturn('programado');
     
-    // Usar a versão de teste do bloc que não depende do GetIt
     bloc = TestTravelExpensesBloc(
       getTravelExpensesUseCase: mockGetTravelExpensesUseCase,
       saveTravelExpenseUseCase: mockSaveTravelExpenseUseCase,

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/core.dart';
 import '../../../../core/services/database_sync_service.dart';
@@ -159,11 +158,11 @@ class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> 
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
-      case ServerFailure:
+      case ServerFailure _:
         return 'Server error occurred';
-      case ConnectionFailure:
+      case ConnectionFailure _:
         return 'No internet connection';
-      case DatabaseFailure:
+      case const (DatabaseFailure):
         return 'Database error: ${failure.message}';
       default:
         return 'An unexpected error occurred';

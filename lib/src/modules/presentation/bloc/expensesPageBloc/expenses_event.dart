@@ -1,4 +1,3 @@
-// Events
 import 'package:equatable/equatable.dart';
 
 import '../../../domain/domain.dart';

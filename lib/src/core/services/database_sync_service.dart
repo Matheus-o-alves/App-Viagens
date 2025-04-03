@@ -16,7 +16,6 @@ class DatabaseSyncService {
   final TravelExpensesRemoteDataSource _remoteDataSource;
   final Connectivity _connectivity;
   
-  // Make connectivity subscription nullable
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   
   Function? onSyncComplete;
@@ -36,7 +35,6 @@ class DatabaseSyncService {
     _connectivity = connectivity;
 
   void initialize() {
-    // Prevent multiple initializations
     if (_isInitialized) {
       debugPrint('DatabaseSyncService: Já inicializado');
       return;
@@ -44,19 +42,15 @@ class DatabaseSyncService {
 
     debugPrint('DatabaseSyncService: Inicializando...');
     
-    // Initial sync
     _checkAndSync();
     
-    // Set up connectivity listener only if not already set
-    if (_connectivitySubscription == null) {
-      _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
+    _connectivitySubscription ??= _connectivity.onConnectivityChanged.listen(
         (_) => _checkAndSync(),
         onError: (error) {
           debugPrint('DatabaseSyncService: Erro de conectividade: $error');
         },
         cancelOnError: false,
       );
-    }
 
     _isInitialized = true;
   }
@@ -82,7 +76,6 @@ class DatabaseSyncService {
   }
 
   Future<void> syncData() async {
-    // Prevent concurrent sync operations
     if (_isSyncing) {
       debugPrint(
         'DatabaseSyncService: Sincronização ignorada (já em andamento)',
@@ -108,7 +101,6 @@ class DatabaseSyncService {
 
       _notifyBlocToRefresh();
 
-      // Optional: Log individual expenses (can be removed in production)
       for (var e in remoteExpensesInfo.despesasdeviagem) {
         final data = _getExpenseData(e);
         debugPrint('🧾 $data');
@@ -123,7 +115,6 @@ class DatabaseSyncService {
     }
   }
 
-  // Extract expense data to a separate method for clarity
   Map<String, dynamic> _getExpenseData(dynamic expense) {
     return expense is TravelExpenseModel
         ? expense.toDatabaseMap()
@@ -227,7 +218,6 @@ class DatabaseSyncService {
   }
 
   void dispose() {
-    // Safely cancel the subscription and reset
     _connectivitySubscription?.cancel();
     _connectivitySubscription = null;
     _isInitialized = false;

@@ -26,7 +26,6 @@ class TravelExpensesInfoModel extends TravelExpensesInfoEntity {
     );
   }
 
-  // Para compatibilidade com código legado
   factory TravelExpensesInfoModel.onlyExpenses(List<TravelExpenseModel> expenses) {
     return TravelExpensesInfoModel(
       despesasdeviagem: expenses,

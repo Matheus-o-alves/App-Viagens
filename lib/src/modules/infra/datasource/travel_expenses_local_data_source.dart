@@ -1,12 +1,16 @@
 import '../../../exports.dart';
 
 
-import 'travel_expenses_data_source.dart';
 
 abstract class TravelExpensesLocalDataSource implements TravelExpensesDataSource {
+  @override
   Future<TravelExpensesInfoEntity> getTravelExpensesInfo();
+  @override
   Future<int> saveTravelExpense(TravelExpenseModel expense);
+  @override
   Future<int> deleteTravelExpense(int id);
+  @override
   Future<TravelExpenseModel?> getTravelExpenseById(int id);
+  @override
   Future<void> syncWithRemote(Map<String, dynamic> remoteData);
 }

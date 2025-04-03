@@ -8,9 +8,9 @@ class ServerFailure extends Failure {
   final int statusCode;
   
   const ServerFailure({
-    required String message,
+    required super.message,
     this.statusCode = 500,
-  }) : super(message: message);
+  });
 }
 
 class ConnectionFailure extends Failure {

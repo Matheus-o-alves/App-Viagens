@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../../exports.dart';
@@ -25,10 +24,8 @@ class TravelExpensesRemoteDataSourceImpl implements TravelExpensesRemoteDataSour
 @override
 Future<TravelExpensesInfoEntity> getTravelExpensesInfo() async {
   try {
-    // Use the mock JSON directly from payments_json.dart
     final Map<String, dynamic> jsonData = mockPaymentsJson;
     
-    // Converta diretamente para o modelo, forçando o tipo correto
     final expenses = (jsonData['travelExpenses'] as List)
         .map((e) => TravelExpenseModel(
           id: e['id'] ?? 0,
@@ -55,13 +52,11 @@ Future<TravelExpensesInfoEntity> getTravelExpensesInfo() async {
         ))
         .toList();
 
-    // Crie o modelo de informações
     final infoModel = TravelExpensesInfoModel(
       despesasdeviagem: expenses,
       cartoes: cards,
     );
 
-    // Sincronize com o banco de dados local
     await syncWithRemote(infoModel.toJson());
     
     return infoModel;
@@ -76,7 +71,6 @@ Future<TravelExpensesInfoEntity> getTravelExpensesInfo() async {
 @override
 Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
   try {
-    // Converta e insira no banco local
     await localDataSource.syncWithRemote(remoteData);
   } catch (e) {
     throw ServerException(
@@ -89,7 +83,6 @@ Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
   @override
   Future<int> saveTravelExpense(TravelExpenseModel expense) async {
     try {
-      // Save the expense to local database
       final savedId = await localDataSource.saveTravelExpense(expense);
       return savedId;
     } catch (e) {
@@ -103,7 +96,6 @@ Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
   @override
   Future<int> deleteTravelExpense(int id) async {
     try {
-      // Delete the expense from local database
       return await localDataSource.deleteTravelExpense(id);
     } catch (e) {
       throw ServerException(
@@ -116,14 +108,11 @@ Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
   @override
   Future<TravelExpenseModel?> getTravelExpenseById(int id) async {
     try {
-      // First, try to get from local database
       final localExpense = await localDataSource.getTravelExpenseById(id);
       if (localExpense != null) return localExpense;
 
-      // If not found locally, use mock data
       final Map<String, dynamic> jsonData = mockPaymentsJson;
       
-      // Find expense by ID in mock data
       final expenses = jsonData['travelExpenses'] as List<dynamic>;
       final expenseData = expenses.firstWhere(
         (expense) => expense['id'] == id,
@@ -143,7 +132,7 @@ Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
 
 
 
-  // Helper method to convert entity to sync data
+  // ignore: unused_element
   Map<String, dynamic> _convertEntityToSyncData(
     TravelExpensesInfoEntity entity,
   ) {
@@ -164,7 +153,6 @@ Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
                     'paymentMethod': e.paymentMethod,
                   };
           } catch (ex) {
-            print('Erro ao converter despesa: $ex');
             return {};
           }
         })
@@ -184,7 +172,6 @@ Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
               'limiteDisponivel': e.limiteDisponivel,
             };
           } catch (ex) {
-            print('Erro ao converter cartão: $ex');
             return {};
           }
         })

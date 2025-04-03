@@ -2,13 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../exports.dart';
 import '../../domain/entity/travel_card_entity.dart';
-import '../../infra/datasource/travel_expenses_data_source.dart';
-import 'package:dartz/dartz.dart';
 
-
-import '../../domain/entity/travel_card_entity.dart';
-
-import '../../infra/datasource/travel_expenses_data_source.dart';
 
 class TravelExpensesRepositoryImpl implements TravelExpensesRepository {
   final TravelExpensesDataSource _dataSource;
@@ -114,7 +108,6 @@ class TravelExpensesRepositoryImpl implements TravelExpensesRepository {
   }
 }
 
-// Adicionar a classe ServerException aqui para facilitar a importação
 class ServerException implements Exception {
   final String message;
   final int statusCode;

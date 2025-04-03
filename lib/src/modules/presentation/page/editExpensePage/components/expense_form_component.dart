@@ -7,7 +7,7 @@ import '../../../../../exports.dart';
 class ExpenseForm extends StatefulWidget {
   final ExpenseFormLoaded state;
 
-  const ExpenseForm({Key? key, required this.state}) : super(key: key);
+  const ExpenseForm({super.key, required this.state});
 
   @override
   State<ExpenseForm> createState() => _ExpenseFormState();
@@ -23,7 +23,6 @@ class _ExpenseFormState extends State<ExpenseForm> {
     super.initState();
     _initializeControllers();
     
-    // Adicionar listeners para notificar o bloc sobre mudanças
     _descriptionController.addListener(_onDescriptionChanged);
     _amountController.addListener(_onAmountChanged);
   }
@@ -69,7 +68,7 @@ class _ExpenseFormState extends State<ExpenseForm> {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<ExpenseFormBloc>();
+    final _ = context.read<ExpenseFormBloc>();
     final state = widget.state;
     
     return Form(
@@ -226,10 +225,8 @@ class _ExpenseFormState extends State<ExpenseForm> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          // Validar formulário
           bloc.add(const ValidateForm());
           
-          // Criar o modelo e salvar
           bloc.add(SaveExpense(
             TravelExpenseModel(
               id: widget.state.expense?.id ?? 0,

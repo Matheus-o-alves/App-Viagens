@@ -348,7 +348,6 @@ class MockTravelExpenseModel extends _i1.Mock
           )
           as Map<String, dynamic>);
 
-  @override
   Map<String, dynamic> toLegacyJson() =>
       (super.noSuchMethod(
             Invocation.method(#toLegacyJson, []),
@@ -356,7 +355,6 @@ class MockTravelExpenseModel extends _i1.Mock
           )
           as Map<String, dynamic>);
 
-  @override
   _i3.TravelExpenseModel copyWith({
     int? id,
     DateTime? expenseDate,

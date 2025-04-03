@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:onfly_viagens_app/src/core/services/database_sync_service.dart';
 import 'src/exports.dart';
 import 'src/modules/presentation/di/di.dart' as di;
 
@@ -7,14 +6,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
 
-  // Apenas inicializa após todas as dependências estarem disponíveis
   Future.microtask(() => di.sl<DatabaseSyncService>().initialize());
 
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

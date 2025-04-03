@@ -8,14 +8,23 @@ import 'package:onfly_viagens_app/src/modules/domain/entity/travel_card_entity.d
 
 /// Classe fake para TravelExpenseEntity, implementando Equatable para testes.
 class FakeTravelExpenseEntity extends Equatable implements TravelExpenseEntity {
+  @override
   final int id;
+  @override
   final DateTime expenseDate;
+  @override
   final String description;
+  @override
   final String category;
+  @override
   final double amount;
+  @override
   final String paymentMethod;
+  @override
   final bool reimbursable;
+  @override
   final bool isReimbursed;
+  @override
   final String status;
 
   const FakeTravelExpenseEntity({
@@ -35,30 +44,32 @@ class FakeTravelExpenseEntity extends Equatable implements TravelExpenseEntity {
       [id, expenseDate, description, category, amount, paymentMethod, reimbursable, isReimbursed, status];
       
         @override
-        // TODO: implement categoria
         String get categoria => throw UnimplementedError();
       
         @override
-        // TODO: implement expenseDateFormatted
         String get expenseDateFormatted => throw UnimplementedError();
       
         @override
-        // TODO: implement quantidade
         double get quantidade => throw UnimplementedError();
       
         @override
-        // TODO: implement reembolsavel
         bool get reembolsavel => throw UnimplementedError();
 }
 
-/// Classe fake para TravelCardEntity, implementando Equatable para testes.
 class FakeTravelCardEntity extends Equatable implements TravelCardEntity {
+  @override
   final int id;
+  @override
   final String nome;
+  @override
   final String numero;
+  @override
   final String titular;
+  @override
   final String validade;
+  @override
   final String bandeira;
+  @override
   final double limiteDisponivel;
 
   const FakeTravelCardEntity({

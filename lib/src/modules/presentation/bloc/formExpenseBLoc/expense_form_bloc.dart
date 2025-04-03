@@ -1,26 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../exports.dart';
 
-import '../../../../core/core.dart';
 
-import 'expense_form_event.dart';
-import 'expense_form_state.dart';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import '../../../../core/core.dart';
-import '../../../../core/utils/helper_formatter.dart';
-import '../../../domain/entity/entity.dart';
-import '../../../domain/usecase/get_travel_expense_by_id_use_case.dart';
-import '../../../domain/usecase/save_travel_expenses_usecase.dart';
-import 'expense_form_event.dart';
-import 'expense_form_state.dart';
+
 
 class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
   final SaveTravelExpenseUseCase saveTravelExpenseUseCase;
   final GetTravelExpenseByIdUseCase getTravelExpenseByIdUseCase;
   
-  // Valores do formulário gerenciados pelo bloc
   DateTime _selectedDate = DateTime.now();
   String _description = '';
   String _category = '';
@@ -31,11 +19,9 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
   String _status = 'programado';
   int _id = 0;
   
-  // Erros de validação
   String? _descriptionError;
   String? _amountError;
   
-  // Lista de opções disponíveis
   final List<String> categories = TextNormalizer.standardCategories;
   final List<String> paymentMethods = TextNormalizer.standardPaymentMethods;
 
@@ -59,10 +45,8 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
     InitializeNewExpense event,
     Emitter<ExpenseFormState> emit,
   ) async {
-    // Reiniciar valores para um novo formulário
     _resetForm();
     
-    // Definir valores padrão
     _category = categories.first;
     _paymentMethod = paymentMethods.first;
     
@@ -107,7 +91,6 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
       (failure) => emit(ExpenseFormError(_mapFailureToMessage(failure))),
       (expense) {
         if (expense != null) {
-          // Preencher formulário com valores da despesa carregada
           _id = expense.id;
           _selectedDate = expense.expenseDate;
           _description = expense.description;
@@ -156,7 +139,6 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
     SaveExpense event,
     Emitter<ExpenseFormState> emit,
   ) async {
-    // Validar o formulário antes de salvar
     final bool isValid = _validateFormFields();
     
     if (!isValid) {
@@ -180,7 +162,6 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
     
     final isNewExpense = _id == 0;
     
-    // Criar o modelo com os dados atuais do bloc
     final expense = TravelExpenseModel(
       id: _id,
       expenseDate: _selectedDate,
@@ -264,15 +245,13 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
     ValidateForm event,
     Emitter<ExpenseFormState> emit
   ) {
-    final bool isValid = _validateFormFields();
+    final bool _ = _validateFormFields();
     emit(_getCurrentFormState());
   }
   
   bool _validateFormFields() {
-    // Validar descrição
     _descriptionError = _description.isEmpty ? 'Por favor, informe uma descrição' : null;
     
-    // Validar valor
     _amountError = _amount <= 0 ? 'Por favor, informe um valor maior que zero' : null;
     
     return _descriptionError == null && _amountError == null;
@@ -280,7 +259,7 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
   
   ExpenseFormLoaded _getCurrentFormState() {
     return ExpenseFormLoaded(
-      expense: null, // Não precisamos passar a entidade original no estado
+      expense: null, 
       date: _selectedDate,
       description: _description,
       category: _category,
@@ -296,18 +275,17 @@ class ExpenseFormBloc extends Bloc<ExpenseFormEvent, ExpenseFormState> {
 
   String _mapFailureToMessage(Failure failure) {
     switch (failure.runtimeType) {
-      case ServerFailure:
+      case const (ServerFailure):
         return 'Erro no servidor';
-      case ConnectionFailure:
+      case const (ConnectionFailure):
         return 'Sem conexão com a internet';
-      case DatabaseFailure:
+      case const (DatabaseFailure):
         return 'Erro no banco de dados: ${failure.message}';
       default:
         return 'Ocorreu um erro inesperado';
     }
   }
   
-  // Método auxiliar para formatação de texto (movido do widget)
   String getDisplayText(String normalizedText) {
     switch (normalizedText) {
       case 'Alimentacao':

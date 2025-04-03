@@ -1,7 +1,4 @@
-// data/models/travel_expense_model.dart
-import 'package:intl/intl.dart';
-import '../../../../core/core.dart';
-import '../../../../core/utils/helper_formatter.dart';
+
 import '../../../domain/domain.dart';
 
 class TravelExpenseModel extends TravelExpenseEntity {
@@ -33,7 +30,6 @@ factory TravelExpenseModel.fromJson(Map<String, dynamic> json) {
   );
 }
 
-// Método auxiliar para conversão segura para booleano
 static bool _convertToBool(dynamic value) {
   if (value is bool) return value;
   if (value is int) return value != 0;

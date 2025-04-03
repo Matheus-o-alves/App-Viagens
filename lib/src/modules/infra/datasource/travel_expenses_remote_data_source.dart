@@ -1,9 +1,9 @@
 import '../../../exports.dart';
 
 abstract class TravelExpensesRemoteDataSource implements TravelExpensesDataSource {
+  @override
   Future<TravelExpensesInfoEntity> getTravelExpensesInfo();
   
-  // Os métodos abaixo são implementados diferentemente por cada subclasse
   @override
   Future<int> saveTravelExpense(TravelExpenseModel expense);
   

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class SavingIndicator extends StatelessWidget {
-  const SavingIndicator({Key? key}) : super(key: key);
+  const SavingIndicator({super.key});
 
   @override
   Widget build(BuildContext context) {

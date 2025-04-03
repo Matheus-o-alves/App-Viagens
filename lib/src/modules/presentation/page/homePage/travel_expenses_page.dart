@@ -87,7 +87,6 @@ class TravelExpensesPage extends StatelessWidget {
     );
   }
 
-  /// Exibe opções de filtro em um modal inferior
   void _showFilterOptions(BuildContext context) {
     final state = context.read<TravelExpensesBloc>().state;
     if (state is! TravelExpensesLoaded) return;

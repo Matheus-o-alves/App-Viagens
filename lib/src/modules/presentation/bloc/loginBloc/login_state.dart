@@ -2,11 +2,6 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../exports.dart';
 
-/// Estados possíveis para o login.
-import 'package:equatable/equatable.dart';
-
-import 'package:equatable/equatable.dart';
-import '../../../../exports.dart';
 
 abstract class LoginState extends Equatable {
   const LoginState();

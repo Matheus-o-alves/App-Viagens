@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../exports.dart';
 import 'components/expense_form_component.dart';
@@ -14,7 +13,6 @@ class ExpenseFormPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Usando o bloc já existente, apenas adicionando eventos a ele
     if (expense != null) {
       context.read<ExpenseFormBloc>().add(LoadExpense(expense!.id));
     } else {
@@ -25,9 +23,8 @@ class ExpenseFormPage extends StatelessWidget {
   }
 }
 
-// View principal do formulário
 class ExpenseFormView extends StatelessWidget {
-  const ExpenseFormView({Key? key}) : super(key: key);
+  const ExpenseFormView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +66,6 @@ class ExpenseFormView extends StatelessWidget {
           } else if (state is ExpenseFormLoaded) {
             return ExpenseForm(state: state);
           } else if (state is ExpenseFormReady) {
-            // Suporte para o estado atual
             return const Center(
               child: Text('O formulário está sendo preparado...'),
             );

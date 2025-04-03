@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onfly_viagens_app/src/exports.dart';
 
-import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 
 @GenerateMocks([TravelExpenseModel])

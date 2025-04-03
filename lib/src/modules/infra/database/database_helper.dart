@@ -5,9 +5,6 @@ import 'package:path/path.dart';
 
 import '../../data/model/travels/travel_card_model.dart';
 
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-
 
 class DatabaseHelper {
   // Singleton pattern
@@ -29,7 +26,7 @@ class DatabaseHelper {
     
     return await openDatabase(
       path,
-      version: 2, // Aumentado para suportar a nova tabela de cartões
+      version: 2, 
       onCreate: _createDatabase,
       onUpgrade: _upgradeDatabase,
     );
@@ -65,7 +62,6 @@ class DatabaseHelper {
 
   Future<void> _upgradeDatabase(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Migração para adicionar a tabela de cartões e atualizar a estrutura da tabela de despesas
       await db.execute('''
         CREATE TABLE IF NOT EXISTS travel_cards(
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,16 +74,13 @@ class DatabaseHelper {
         )
       ''');
       
-      // Verificar se as colunas antigas existem e atualizar nomes
       var tableInfo = await db.rawQuery("PRAGMA table_info(travel_expenses)");
       bool hasCategory = tableInfo.any((column) => column['name'] == 'category');
       bool hasAmount = tableInfo.any((column) => column['name'] == 'amount');
       bool hasReimbursable = tableInfo.any((column) => column['name'] == 'reimbursable');
       
-      // Se as colunas antigas existirem, criar tabela temporária e migrar dados
       if (hasCategory || hasAmount || hasReimbursable) {
         await db.transaction((txn) async {
-          // Criar tabela temporária com nova estrutura
           await txn.execute('''
             CREATE TABLE temp_travel_expenses(
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,7 +95,6 @@ class DatabaseHelper {
             )
           ''');
           
-          // Migrar dados
           await txn.execute('''
             INSERT INTO temp_travel_expenses(
               id, expenseDate, description, categoria, quantidade, reembolsavel, isReimbursed, status, paymentMethod
@@ -116,14 +108,11 @@ class DatabaseHelper {
             FROM travel_expenses
           ''');
           
-          // Excluir tabela antiga
           await txn.execute('DROP TABLE travel_expenses');
           
-          // Renomear tabela temporária
           await txn.execute('ALTER TABLE temp_travel_expenses RENAME TO travel_expenses');
         });
       } else {
-        // Adicionar novas colunas se a tabela tiver estrutura diferente
         await db.execute('ALTER TABLE travel_expenses ADD COLUMN categoria TEXT DEFAULT ""');
         await db.execute('ALTER TABLE travel_expenses ADD COLUMN quantidade REAL DEFAULT 0');
         await db.execute('ALTER TABLE travel_expenses ADD COLUMN reembolsavel INTEGER DEFAULT 0');
@@ -148,7 +137,7 @@ Future<int> insertTravelExpense(TravelExpenseModel expense) async {
   final db = await database;
   return await db.insert(
     'travel_expenses',
-    expense.toDatabaseMap(), // ✅ Aqui
+    expense.toDatabaseMap(), 
     conflictAlgorithm: ConflictAlgorithm.replace,
   );
 }
@@ -157,7 +146,7 @@ Future<int> updateTravelExpense(TravelExpenseModel expense) async {
   final db = await database;
   return await db.update(
     'travel_expenses',
-    expense.toDatabaseMap(), // ✅ Aqui
+    expense.toDatabaseMap(), 
     where: 'id = ?',
     whereArgs: [expense.id],
   );
@@ -257,7 +246,7 @@ Future<void> batchInsertExpenses(List<TravelExpenseModel> expenses) async {
     final Batch batch = db.batch();
     
     for (var card in cards) {
-      // Se o ID existir, atualiza. Caso contrário, insere.
+
       if (card.id > 0) {
         batch.update(
           'travel_cards',
