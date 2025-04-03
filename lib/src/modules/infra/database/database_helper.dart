@@ -181,7 +181,7 @@ Future<void> batchInsertExpenses(List<TravelExpenseModel> expenses) async {
 
   for (var expense in expenses) {
     final map = expense.toDatabaseMap();
-    debugPrint('📝 Inserindo ou substituindo: $map');
+    debugPrint('📝 Inserindo ou substituindo despesa: $map');
 
     batch.insert(
       'travel_expenses',
@@ -193,9 +193,7 @@ Future<void> batchInsertExpenses(List<TravelExpenseModel> expenses) async {
   await batch.commit(noResult: true);
 }
 
-
-
- Future<List<TravelCardModel>> getAllTravelCards() async {
+Future<List<TravelCardModel>> getAllTravelCards() async {
   final db = await database;
   final List<Map<String, dynamic>> maps = await db.query('travel_cards');
 
@@ -208,57 +206,83 @@ Future<void> batchInsertExpenses(List<TravelExpenseModel> expenses) async {
     return TravelCardModel.fromJson(maps[i]);
   });
 }
-  Future<int> insertTravelCard(TravelCardModel card) async {
-    final db = await database;
-    return await db.insert(
-      'travel_cards',
-      card.toJson(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+
+Future<int> insertTravelCard(TravelCardModel card) async {
+  final db = await database;
+  final cardMap = card.toJson();
+  debugPrint('🎴 Inserindo cartão: $cardMap');
+  
+  return await db.insert(
+    'travel_cards',
+    cardMap,
+    conflictAlgorithm: ConflictAlgorithm.replace,
+  );
+}
+
+Future<int> updateTravelCard(TravelCardModel card) async {
+  final db = await database;
+  return await db.update(
+    'travel_cards',
+    card.toJson(),
+    where: 'id = ?',
+    whereArgs: [card.id],
+  );
+}
+
+Future<TravelCardModel?> getTravelCardById(int id) async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query(
+    'travel_cards',
+    where: 'id = ?',
+    whereArgs: [id],
+  );
+  
+  if (maps.isNotEmpty) {
+    return TravelCardModel.fromJson(maps.first);
+  }
+  return null;
+}
+
+Future<void> batchInsertCards(List<TravelCardModel> cards) async {
+  if (cards.isEmpty) {
+    debugPrint('⚠️ Lista de cartões vazia, nada para inserir');
+    return;
   }
 
-  Future<int> updateTravelCard(TravelCardModel card) async {
-    final db = await database;
-    return await db.update(
-      'travel_cards',
-      card.toJson(),
-      where: 'id = ?',
-      whereArgs: [card.id],
-    );
-  }
-
-  Future<TravelCardModel?> getTravelCardById(int id) async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'travel_cards',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    
-    if (maps.isNotEmpty) {
-      return TravelCardModel.fromJson(maps.first);
+  final db = await database;
+  final Batch batch = db.batch();
+  
+  debugPrint('🔄 Iniciando batchInsertCards com ${cards.length} cartões');
+  
+  try {
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      final cardMap = card.toJson();
+      debugPrint('🃏 Inserindo cartão ${i+1}/${cards.length}: $cardMap');
+      
+      batch.insert(
+        'travel_cards', 
+        cardMap,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
-    return null;
-  }
-
-  Future<void> batchInsertCards(List<TravelCardModel> cards) async {
-    final db = await database;
-    final Batch batch = db.batch();
     
+    final results = await batch.commit();
+    debugPrint('✅ Batch concluído com resultados: $results');
+  } catch (e, stackTrace) {
+    debugPrint('❌ Erro ao inserir cartões em lote: $e');
+    debugPrint('🚨 Stack trace: $stackTrace');
+    
+    // Tenta inserir individualmente para ver se funciona
+    debugPrint('🔄 Tentando inserir cartões individualmente...');
     for (var card in cards) {
-
-      if (card.id > 0) {
-        batch.update(
-          'travel_cards',
-          card.toJson(),
-          where: 'id = ?',
-          whereArgs: [card.id],
-        );
-      } else {
-        batch.insert('travel_cards', card.toJson());
+      try {
+        final id = await insertTravelCard(card);
+        debugPrint('✅ Cartão inserido com ID: $id');
+      } catch (e) {
+        debugPrint('❌ Falha ao inserir cartão individual: $e');
       }
     }
-    
-    await batch.commit(noResult: true);
   }
+}
 }

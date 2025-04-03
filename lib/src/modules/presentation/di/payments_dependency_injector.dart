@@ -38,12 +38,13 @@ void _registerAuthenticationDependencies() {
 
 void _registerTravelExpensesDependencies() {
 
-  sl.registerLazySingleton<TravelExpensesRemoteDataSource>(
-    () => TravelExpensesRemoteDataSourceImpl(
-      client: sl<http.Client>(),
-      localDataSource: sl<TravelExpensesLocalDataSource>(), 
-    ),
-  );
+sl.registerLazySingleton<TravelExpensesRemoteDataSource>(
+  () => TravelExpensesRemoteDataSourceImpl(
+    client: sl<http.Client>(),
+    localDataSource: sl<TravelExpensesLocalDataSource>(),
+    connectivity: sl<Connectivity>(),  
+  ),
+);
   
   sl.registerLazySingleton<TravelExpensesLocalDataSource>(
     () => TravelExpensesLocalDataSourceImpl(databaseHelper: sl<DatabaseHelper>()),

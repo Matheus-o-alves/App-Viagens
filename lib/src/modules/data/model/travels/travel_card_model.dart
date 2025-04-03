@@ -11,30 +11,28 @@ class TravelCardModel extends TravelCardEntity {
     required super.limiteDisponivel,
   });
 
-  factory TravelCardModel.fromJson(Map<String, dynamic> json) {
-    return TravelCardModel(
-      id: json['id'] ?? 0,
-      nome: json['nome'] ?? '',
-      numero: json['numero'] ?? '',
-      titular: json['titular'] ?? '',
-      validade: json['validade'] ?? '',
-      bandeira: json['bandeira'] ?? '',
-      limiteDisponivel: (json['limiteDisponivel'] ?? 0.0).toDouble(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'nome': nome,
-      'numero': numero,
-      'titular': titular,
-      'validade': validade,
-      'bandeira': bandeira,
-      'limiteDisponivel': limiteDisponivel,
-    };
-  }
-
+factory TravelCardModel.fromJson(Map<String, dynamic> json) {
+  return TravelCardModel(
+    id: json['id'] ?? json['ID'] ?? 0,
+    nome: json['name'] ?? json['nome'] ?? json['Name'] ?? '',
+    numero: json['number'] ?? json['numero'] ?? json['Number'] ?? '',
+    titular: json['holder'] ?? json['titular'] ?? json['Holder'] ?? '',
+    validade: json['validThru'] ?? json['validade'] ?? json['ValidThru'] ?? '',
+    bandeira: json['brand'] ?? json['bandeira'] ?? json['Brand'] ?? '',
+    limiteDisponivel: (json['availableLimit'] ?? json['limiteDisponivel'] ?? json['AvailableLimit'] ?? 0.0).toDouble(),
+  );
+}
+Map<String, dynamic> toJson() {
+  return {
+    'id': id,
+    'nome': nome,         
+    'numero': numero,     
+    'titular': titular,   
+    'validade': validade, 
+    'bandeira': bandeira,
+    'limiteDisponivel': limiteDisponivel, 
+  };
+}
   TravelCardModel copyWith({
     int? id,
     String? nome,

@@ -8,7 +8,6 @@ import '../data.dart';
 
 import '../model/travels/travel_card_model.dart';
 
-
 class TravelExpensesLocalDataSourceImpl
     implements TravelExpensesLocalDataSource {
   final DatabaseHelper _databaseHelper;
@@ -73,24 +72,39 @@ class TravelExpensesLocalDataSourceImpl
     }
   }
 
-  @override
-  Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
-    try {
-      final infoModel = TravelExpensesInfoModel.fromJson(remoteData);
-
-      await _databaseHelper.batchInsertExpenses(
-        infoModel.despesasdeviagem.map((e) => e as TravelExpenseModel).toList(),
-      );
-      debugPrint('✅ batchInsertExpenses concluído com sucesso');
-
-      await _databaseHelper.batchInsertCards(
-        infoModel.cartoes.map((e) => e as TravelCardModel).toList(),
-      );
-      debugPrint('✅ batchInsertCards concluído com sucesso');
-    } catch (e) {
-      throw DatabaseException(message: 'Failed to sync with remote: $e');
+@override
+Future<void> syncWithRemote(Map<String, dynamic> remoteData) async {
+  try {
+    debugPrint('🔍 Dados recebidos para sincronização: $remoteData');
+    
+    // Adicione logs detalhados
+    debugPrint('🏦 Chaves no remoteData: ${remoteData.keys}');
+    
+    final infoModel = TravelExpensesInfoModel.fromJson(remoteData);
+    
+    debugPrint('🔢 Despesas a serem inseridas: ${infoModel.despesasdeviagem.length}');
+    debugPrint('💳 Cartões a serem inseridos: ${infoModel.cartoes.length}');
+    
+    // Log detalhado dos cartões
+    for (var card in infoModel.cartoes) {
+      debugPrint('🃏 Cartão a ser inserido: ${card.toJson()}');
     }
+
+    await _databaseHelper.batchInsertExpenses(
+      infoModel.despesasdeviagem.map((e) => e as TravelExpenseModel).toList(),
+    );
+    debugPrint('✅ batchInsertExpenses concluído com sucesso');
+
+    await _databaseHelper.batchInsertCards(
+      infoModel.cartoes.map((e) => e as TravelCardModel).toList(),
+    );
+    debugPrint('✅ batchInsertCards concluído com sucesso');
+  } catch (e, stackTrace) {
+    debugPrint('❌ Erro na sincronização: $e');
+    debugPrint('🚨 Stack trace: $stackTrace');
+    throw DatabaseException(message: 'Failed to sync with remote: $e');
   }
+}
 }
 
 class DatabaseException implements Exception {

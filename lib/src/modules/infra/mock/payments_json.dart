@@ -67,15 +67,15 @@ final Map<String, dynamic> mockPaymentsJson = {
       "paymentMethod": "Cartão Corporativo"
     }
   ],
-  "cards": [
+  "cards": [  
     {
       "id": 1,
-      "name": "Cartão Corporativo Principal",
-      "number": "**** **** **** 1234",
-      "holder": "Onfly Me Contrata", 
-      "validThru": "12/2026",
-      "brand": "Visa",
-      "availableLimit": 5000
+      "nome": "Cartão Corporativo Principal",
+      "numero": "**** **** **** 1234",
+      "titular": "Onfly Me Contrata", 
+      "validade": "12/2026",
+      "bandeira": "Visa",
+      "limiteDisponivel": 5000.0
     }
   ]
 };

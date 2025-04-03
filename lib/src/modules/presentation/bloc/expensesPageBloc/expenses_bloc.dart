@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import '../../../../core/core.dart';
 import '../../../../core/services/database_sync_service.dart';
 import '../../../domain/domain.dart';
+import '../../../domain/entity/travel_card_entity.dart';
 import '../../../domain/usecase/delete_travels_usescases.dart';
 import '../../../domain/usecase/get_travel_expense_by_id_use_case.dart';
 import '../../../domain/usecase/save_travel_expenses_usecase.dart';
@@ -49,9 +50,23 @@ class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> 
     result.fold(
       (failure) => emit(TravelExpensesError(_mapFailureToMessage(failure))),
       (info) {
-        final sortedExpenses = List<TravelExpenseEntity>.from(info.despesasdeviagem)
-          ..sort((a, b) => b.expenseDate.compareTo(a.expenseDate));
-        emit(TravelExpensesLoaded(sortedExpenses, info.cartoes));
+        // Filtrar e converter para os tipos corretos
+        final expensesList = info.despesasdeviagem
+            .where((e) => e is TravelExpenseEntity)
+            .cast<TravelExpenseEntity>()
+            .toList();
+        
+        final cardsList = info.cartoes
+            .where((c) => c is TravelCardEntity)
+            .cast<TravelCardEntity>()
+            .toList();
+        
+        debugPrint('🔍 Despesas carregadas: ${expensesList.length}');
+        debugPrint('💳 Cartões carregados: ${cardsList.length}');
+        
+        // Ordenar despesas por data
+        expensesList.sort((a, b) => b.expenseDate.compareTo(a.expenseDate));
+        emit(TravelExpensesLoaded(expensesList, cardsList));
       },
     );
   }
@@ -73,9 +88,20 @@ class TravelExpensesBloc extends Bloc<TravelExpensesEvent, TravelExpensesState> 
     result.fold(
       (failure) => emit(TravelExpensesError(_mapFailureToMessage(failure))),
       (info) {
-        final sortedExpenses = List<TravelExpenseEntity>.from(info.despesasdeviagem)
-          ..sort((a, b) => b.expenseDate.compareTo(a.expenseDate));
-        emit(TravelExpensesLoaded(sortedExpenses, info.cartoes));
+        // Filtrar e converter para os tipos corretos
+        final expensesList = info.despesasdeviagem
+            .where((e) => e is TravelExpenseEntity)
+            .cast<TravelExpenseEntity>()
+            .toList();
+        
+        final cardsList = info.cartoes
+            .where((c) => c is TravelCardEntity)
+            .cast<TravelCardEntity>()
+            .toList();
+        
+        // Ordenar despesas por data
+        expensesList.sort((a, b) => b.expenseDate.compareTo(a.expenseDate));
+        emit(TravelExpensesLoaded(expensesList, cardsList));
       },
     );
   }
