@@ -1,6 +1,6 @@
-// presentation/bloc/travelExpensesBloc/travel_expenses_state.dart
 import 'package:equatable/equatable.dart';
 import '../../../domain/domain.dart';
+import '../../../domain/entity/travel_card_entity.dart';
 
 abstract class TravelExpensesState extends Equatable {
   const TravelExpensesState();
@@ -15,11 +15,12 @@ class TravelExpensesLoading extends TravelExpensesState {}
 
 class TravelExpensesLoaded extends TravelExpensesState {
   final List<TravelExpenseEntity> expenses;
+  final List<TravelCardEntity> cards;
 
-  const TravelExpensesLoaded(this.expenses);
+  const TravelExpensesLoaded(this.expenses, this.cards);
 
   @override
-  List<Object?> get props => [expenses];
+  List<Object?> get props => [expenses, cards];
 }
 
 class TravelExpenseDetailsLoaded extends TravelExpensesState {

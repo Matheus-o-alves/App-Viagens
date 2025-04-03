@@ -2,23 +2,14 @@ import 'package:dartz/dartz.dart';
 import '../../../core/core.dart';
 import '../domain.dart';
 
-class GetTravelExpensesUseCase implements UseCase<List<TravelExpenseEntity>, NoParams> {
+class GetTravelExpensesUseCase
+    implements UseCase<TravelExpensesInfoEntity, NoParams> {
   final TravelExpensesRepository _repository;
 
   GetTravelExpensesUseCase(this._repository);
 
   @override
-  Future<Either<Failure, List<TravelExpenseEntity>>> call([NoParams? params]) async {
-    final result = await _repository.getTravelExpenses();
-
-    if (result.isRight()) {
-      final expenses = result.getOrElse(() => []);
-      
-      expenses.sort((a, b) => b.expenseDate.compareTo(a.expenseDate)); 
-
-      return Right(expenses);
-    } else {
-      return result;
-    }
+  Future<Either<Failure, TravelExpensesInfoEntity>> call([NoParams? params]) async {
+    return await _repository.getTravelExpensesInfo();
   }
 }

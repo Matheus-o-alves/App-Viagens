@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:onfly_viagens_app/src/modules/data/model/model.dart' show TravelExpenseModel;
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -130,15 +131,19 @@ class DatabaseHelper {
     }
   }
 
-  // TRAVEL EXPENSES METHODS
-  Future<List<TravelExpenseModel>> getAllTravelExpenses() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('travel_expenses');
-    
-    return List.generate(maps.length, (i) {
-      return TravelExpenseModel.fromJson(maps[i]);
-    });
+Future<List<TravelExpenseModel>> getAllTravelExpenses() async {
+  final db = await database;
+  final List<Map<String, dynamic>> maps = await db.query('travel_expenses');
+
+  debugPrint('➡️ Dados encontrados no banco: ${maps.length} registros');
+  for (var map in maps) {
+    debugPrint(map.toString());
   }
+
+  return List.generate(maps.length, (i) {
+    return TravelExpenseModel.fromJson(maps[i]);
+  });
+}
 Future<int> insertTravelExpense(TravelExpenseModel expense) async {
   final db = await database;
   return await db.insert(
@@ -181,26 +186,25 @@ Future<int> updateTravelExpense(TravelExpenseModel expense) async {
     return null;
   }
 
-  Future<void> batchInsertExpenses(List<TravelExpenseModel> expenses) async {
-    final db = await database;
-    final Batch batch = db.batch();
-    
-    for (var expense in expenses) {
-      // Se o ID existir, atualiza. Caso contrário, insere.
-      if (expense.id > 0) {
-        batch.update(
-          'travel_expenses',
-          expense.toJson(),
-          where: 'id = ?',
-          whereArgs: [expense.id],
-        );
-      } else {
-        batch.insert('travel_expenses', expense.toJson());
-      }
-    }
-    
-    await batch.commit(noResult: true);
+Future<void> batchInsertExpenses(List<TravelExpenseModel> expenses) async {
+  final db = await database;
+  final Batch batch = db.batch();
+
+  for (var expense in expenses) {
+    final map = expense.toDatabaseMap();
+    debugPrint('📝 Inserindo ou substituindo: $map');
+
+    batch.insert(
+      'travel_expenses',
+      map,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
+
+  await batch.commit(noResult: true);
+}
+
+
 
   // TRAVEL CARDS METHODS
   Future<List<TravelCardModel>> getAllTravelCards() async {

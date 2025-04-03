@@ -34,25 +34,38 @@ class TravelExpensesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A73E8),
-        elevation: 0,
-        title: const Text(
-          'Travel Expenses',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list, color: Colors.white),
-            onPressed: () {
-              _showFilterOptions(context);
-            },
-          ),
-        ],
-      ),
+     appBar: AppBar(
+  backgroundColor: const Color(0xFF1A73E8),
+  elevation: 0,
+  title: const Text(
+    'Travel Expenses',
+    style: TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.sync, color: Colors.white),
+      onPressed: () {
+        // Forçar sincronização e atualizar a UI
+        final databaseSyncService = GetIt.instance<DatabaseSyncService>();
+        databaseSyncService.forceSyncData();
+        
+        // Mostrar feedback ao usuário
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Sincronizando dados...')),
+        );
+      },
+    ),
+    IconButton(
+      icon: const Icon(Icons.credit_card, color: Colors.white),
+      onPressed: () {
+        _showFilterOptions(context);
+      },
+    ),
+  ],
+),
       body: BlocConsumer<TravelExpensesBloc, TravelExpensesState>(
         listener: (context, state) {
           if (state is TravelExpenseActionSuccess) {
@@ -260,88 +273,78 @@ class TravelExpensesPage extends StatelessWidget {
       },
     );
   }
+void _showFilterOptions(BuildContext context) {
+  final state = context.read<TravelExpensesBloc>().state;
 
-  void _showFilterOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Filter Expenses',
+  if (state is! TravelExpensesLoaded) return;
+
+  final cards = state.cards;
+
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+              child: Text(
+                'Cartões de Viagem',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'Date Range',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _buildFilterChip(context, 'All', true),
-                  _buildFilterChip(context, 'This Month', false),
-                  _buildFilterChip(context, 'Last Month', false),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Status',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  _buildFilterChip(context, 'All', true),
-                  _buildFilterChip(context, 'Reimbursed', false),
-                  _buildFilterChip(context, 'Pending', false),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Category',
-                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  _buildFilterChip(context, 'All', true),
-                  _buildFilterChip(context, 'Transport', false),
-                  _buildFilterChip(context, 'Accommodation', false),
-                  _buildFilterChip(context, 'Food', false),
-                ],
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            const SizedBox(height: 16),
+            if (cards.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(12.0),
+                  child: Text('Nenhum cartão disponível.'),
+                ),
+              )
+            else
+              ...cards.map(
+                (card) => Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // Apply filters here...
-                  },
-                  child: const Text('Apply Filters'),
+                  elevation: 2,
+                  child: ListTile(
+                    leading: const Icon(Icons.credit_card, color: Colors.blue),
+                    title: Text(card.nome),
+                    subtitle: Text(
+                      'Número: ${card.numero}\nTitular: ${card.titular}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Limite'),
+                        Text(
+                          'R\$ ${card.limiteDisponivel.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+          ],
+        ),
+      );
+    },
+  );
+}
+
 
   Widget _buildFilterChip(BuildContext context, String label, bool selected) {
     return Padding(

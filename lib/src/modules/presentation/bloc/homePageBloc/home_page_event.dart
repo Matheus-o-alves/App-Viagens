@@ -53,3 +53,7 @@ class GetTravelExpenseDetails extends TravelExpensesEvent {
   @override
   List<Object?> get props => [expenseId];
 }
+
+class SyncTravelExpenses extends TravelExpensesEvent {
+  const SyncTravelExpenses();
+}

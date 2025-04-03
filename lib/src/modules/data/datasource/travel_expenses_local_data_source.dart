@@ -1,4 +1,6 @@
 // travel_expenses_local_data_source.dart
+import 'package:flutter/material.dart';
+
 import '../../domain/domain.dart';
 import '../../infra/database/database_helper.dart';
 import '../../infra/datasource/travel_expenses_data_source.dart';
@@ -69,19 +71,20 @@ class TravelExpensesLocalDataSourceImpl implements TravelExpensesLocalDataSource
     try {
       final infoModel = TravelExpensesInfoModel.fromJson(remoteData);
       
-      await _databaseHelper.batchInsertExpenses(
-        infoModel.despesasdeviagem.map((e) => e as TravelExpenseModel).toList()
-      );
-      
-      await _databaseHelper.batchInsertCards(
-        infoModel.cartoes.map((e) => e as TravelCardModel).toList()
-      );
+     await _databaseHelper.batchInsertExpenses(
+  infoModel.despesasdeviagem.map((e) => e as TravelExpenseModel).toList()
+);
+debugPrint('✅ batchInsertExpenses concluído com sucesso');
+
+await _databaseHelper.batchInsertCards(
+  infoModel.cartoes.map((e) => e as TravelCardModel).toList()
+);
+debugPrint('✅ batchInsertCards concluído com sucesso');
     } catch (e) {
       throw DatabaseException(message: 'Failed to sync with remote: $e');
     }
   }
 }
-
 class DatabaseException implements Exception {
   final String message;
 
