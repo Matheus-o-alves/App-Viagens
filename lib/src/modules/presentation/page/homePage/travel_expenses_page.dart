@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../exports.dart';
-import 'components/expense_loaded_component.dart';
 
 class TravelExpensesPage extends StatelessWidget {
   const TravelExpensesPage({super.key});

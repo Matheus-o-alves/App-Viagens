@@ -4,7 +4,6 @@ import 'package:mockito/annotations.dart';
 
 import 'package:onfly_viagens_app/src/exports.dart';
 import 'package:onfly_viagens_app/src/modules/data/datasource/travel_expenses_local_data_source.dart';
-import 'package:onfly_viagens_app/src/modules/data/model/travels/travel_card_model.dart';
 
 
 @GenerateMocks([DatabaseHelper])

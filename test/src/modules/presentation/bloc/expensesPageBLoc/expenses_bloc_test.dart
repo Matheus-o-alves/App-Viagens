@@ -6,7 +6,6 @@ import 'package:get_it/get_it.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:onfly_viagens_app/src/exports.dart';
-import 'package:onfly_viagens_app/src/modules/domain/entity/travel_card_entity.dart';
 
 @GenerateMocks([
   GetTravelExpensesUseCase,

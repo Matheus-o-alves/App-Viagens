@@ -1,4 +1,3 @@
-// presentation/bloc/expenseFormBloc/expense_form_state.dart
 import 'package:equatable/equatable.dart';
 import '../../../domain/entity/entity.dart';
 

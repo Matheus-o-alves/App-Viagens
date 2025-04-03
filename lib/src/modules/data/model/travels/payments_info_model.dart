@@ -1,5 +1,4 @@
 import '../../../../exports.dart';
-import 'travel_card_model.dart';
 
 class TravelExpensesInfoModel extends TravelExpensesInfoEntity {
   const TravelExpensesInfoModel({

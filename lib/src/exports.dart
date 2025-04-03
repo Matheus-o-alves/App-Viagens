@@ -20,7 +20,6 @@ export 'core/utils/extensions.dart';
 export 'core/utils/helper_formatter.dart';
 export 'core/utils/utils.dart';
 export 'modules/data/datasource/auth_remote_data_source.dart';
-export 'modules/data/datasource/datasource.dart';
 
 export 'modules/data/model/model.dart';
 export 'modules/data/model/travels/payments.dart';

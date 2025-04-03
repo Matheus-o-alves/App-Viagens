@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../exports.dart';
-import 'components/expense_form_component.dart';
-import 'components/saving_indicator_component.dart';
+
 
 class ExpenseFormPage extends StatelessWidget {
   final TravelExpenseEntity? expense;
@@ -95,7 +94,4 @@ class ExpenseFormView extends StatelessWidget {
     context.read<TravelExpensesBloc>().add(const RefreshTravelExpenses());
   }
 
-  void _navigateBack(BuildContext context) {
-    Navigator.pop(context);
-  }
 }

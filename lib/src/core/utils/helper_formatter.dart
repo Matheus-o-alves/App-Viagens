@@ -11,8 +11,7 @@ class PaymentsFormatter {
 }
 
 
-// Adicione esta classe de utilitário para normalizar textos em toda a aplicação
-// utils/text_normalizer.dart
+
 class TextNormalizer {
   static String normalize(String text) {
     return text
@@ -31,7 +30,6 @@ class TextNormalizer {
         .replaceAll('ü', 'u');
   }
   
-  // Lista com nomenclatura consistente para categorias
   static List<String> standardCategories = [
     'Transporte',
     'Hospedagem',
@@ -41,7 +39,6 @@ class TextNormalizer {
     'Outro'
   ];
   
-  // Lista com nomenclatura consistente para métodos de pagamento
   static List<String> standardPaymentMethods = [
     'Cartao Corporativo',
     'Dinheiro',
@@ -50,7 +47,6 @@ class TextNormalizer {
     'Transferencia'
   ];
   
-  // Método para garantir que uma categoria seja válida
   static String ensureValidCategory(String category) {
     String normalized = normalize(category);
     if (standardCategories.contains(normalized)) {
@@ -59,7 +55,6 @@ class TextNormalizer {
     return standardCategories.first;
   }
   
-  // Método para garantir que um método de pagamento seja válido
   static String ensureValidPaymentMethod(String method) {
     String normalized = normalize(method);
     if (standardPaymentMethods.contains(normalized)) {

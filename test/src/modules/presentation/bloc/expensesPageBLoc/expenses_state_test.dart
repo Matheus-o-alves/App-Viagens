@@ -1,12 +1,9 @@
-// travel_expenses_state_test.dart
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:equatable/equatable.dart';
 import 'package:onfly_viagens_app/src/exports.dart';
-import 'package:onfly_viagens_app/src/modules/domain/entity/travel_card_entity.dart';
 
 
-/// Classe fake para TravelExpenseEntity, implementando Equatable para testes.
 class FakeTravelExpenseEntity extends Equatable implements TravelExpenseEntity {
   @override
   final int id;

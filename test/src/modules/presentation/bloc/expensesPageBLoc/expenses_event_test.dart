@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:equatable/equatable.dart';
 import 'package:onfly_viagens_app/src/exports.dart';
-import 'package:onfly_viagens_app/src/modules/domain/entity/travel_card_entity.dart';
 
 class FakeTravelExpenseEntity extends Equatable implements TravelExpenseEntity {
   @override

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../exports.dart';
-import 'expense_detail_modal_component.dart';
+
 
 class ExpenseSummary extends StatelessWidget {
   final List<TravelExpenseEntity> expenses;

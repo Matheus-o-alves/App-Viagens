@@ -2,9 +2,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../exports.dart';
-import '../../infra/datasource/travel_expenses_local_data_source.dart';
-import '../../infra/datasource/travel_expenses_remote_data_source.dart';
-import '../model/travels/travel_card_model.dart';
+
 
 class ServerException implements Exception {
   final String message;
