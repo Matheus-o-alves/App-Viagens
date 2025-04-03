@@ -5,7 +5,6 @@ import '../../../../exports.dart';
 import 'components/expense_form_component.dart';
 import 'components/saving_indicator_component.dart';
 
-
 class ExpenseFormPage extends StatelessWidget {
   final TravelExpenseEntity? expense;
 
@@ -31,20 +30,24 @@ class ExpenseFormView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: BlocBuilder<ExpenseFormBloc, ExpenseFormState>(
-          buildWhen: (previous, current) => 
-              current is ExpenseFormLoaded || current is ExpenseFormReady,
+          buildWhen:
+              (previous, current) =>
+                  current is ExpenseFormLoaded || current is ExpenseFormReady,
           builder: (context, state) {
-            final bool isNewExpense = state is ExpenseFormReady 
-                ? state.expense == null 
-                : (state is ExpenseFormLoaded ? state.expense == null : true);
-                
+            final bool isNewExpense =
+                state is ExpenseFormReady
+                    ? state.expense == null
+                    : (state is ExpenseFormLoaded
+                        ? state.expense == null
+                        : true);
+
             return Text(
               isNewExpense ? 'Adicionar Despesa' : 'Editar Despesa',
               style: const TextStyle(color: Colors.white),
             );
           },
         ),
-        backgroundColor: const Color(0xFF1A73E8),
+        backgroundColor: AppColors.tagBlue,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -53,7 +56,7 @@ class ExpenseFormView extends StatelessWidget {
           if (state is ExpenseFormSuccess) {
             _showSuccessMessage(context, state.message);
             _refreshExpensesList(context);
-            _navigateBack(context);
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
           } else if (state is ExpenseFormError) {
             _showErrorMessage(context, state.message);
           }
@@ -78,19 +81,13 @@ class ExpenseFormView extends StatelessWidget {
 
   void _showSuccessMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.green),
     );
   }
 
   void _showErrorMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 

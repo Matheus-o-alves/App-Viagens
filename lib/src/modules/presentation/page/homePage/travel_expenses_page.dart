@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../exports.dart';
 import 'components/expense_loaded_component.dart';
 
-
 class TravelExpensesPage extends StatelessWidget {
   const TravelExpensesPage({super.key});
 
@@ -19,11 +18,15 @@ class TravelExpensesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quero Viajar com a Onfly', style: TextStyle(color: Colors.white),),
-        backgroundColor: Colors.blueAccent,
+        automaticallyImplyLeading: false, 
+        title: const Text(
+          'Quero Viajar com a Onfly',
+          style: TextStyle(color: AppColors.white),
+        ),
+        backgroundColor: AppColors.tagBlue,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: AppColors.white),
             onPressed: () {
               context.read<TravelExpensesBloc>().add(
                 const RefreshTravelExpenses(),
@@ -31,7 +34,7 @@ class TravelExpensesPage extends StatelessWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.credit_card),
+            icon: const Icon(Icons.credit_card, color: AppColors.white),
             onPressed: () => _showFilterOptions(context),
           ),
         ],
@@ -39,9 +42,9 @@ class TravelExpensesPage extends StatelessWidget {
       body: BlocConsumer<TravelExpensesBloc, TravelExpensesState>(
         listener: (context, state) {
           if (state is TravelExpenseActionSuccess) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(state.message)));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
           }
         },
         builder: (context, state) {
@@ -50,29 +53,31 @@ class TravelExpensesPage extends StatelessWidget {
           } else if (state is TravelExpensesLoaded) {
             return ExpenseLoadedContent(
               expenses: state.expenses,
-              onExpenseTap:
-                  (expense) =>
-                      _navigateToExpenseForm(context, expense: expense),
-              onRefresh:
-                  () => context.read<TravelExpensesBloc>().add(
-                    const RefreshTravelExpenses(),
-                  ),
+              onExpenseTap: (expense) => _navigateToExpenseForm(context, expense: expense),
+              onRefresh: () => context.read<TravelExpensesBloc>().add(const RefreshTravelExpenses()),
             );
           } else if (state is TravelExpensesError) {
             return Center(child: Text(state.message));
           }
+
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 16),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.white,
+                  ),
                   onPressed: () {
                     context.read<TravelExpensesBloc>().add(
                       const SyncTravelExpenses(),
                     );
                   },
-                  child: const Text('Deseja sincronizar duas despesas?'),
+                  child: const Text(
+                    'Deseja vizualizar duas despesas?',
+                    style: TextStyle(color: AppColors.tagBlue),
+                  ),
                 ),
               ],
             ),
@@ -80,8 +85,8 @@ class TravelExpensesPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blueAccent,
-        child: const Icon(Icons.add),
+        backgroundColor: AppColors.tagBlue,
+        child: const Icon(Icons.add, color: AppColors.white),
         onPressed: () => _navigateToExpenseForm(context),
       ),
     );
@@ -107,7 +112,11 @@ class TravelExpensesPage extends StatelessWidget {
               const Center(
                 child: Text(
                   'Cartões de Viagem',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.tagBlue,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -115,7 +124,10 @@ class TravelExpensesPage extends StatelessWidget {
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.all(12.0),
-                    child: Text('Nenhum cartão disponível.'),
+                    child: Text(
+                      'Nenhum cartão disponível.',
+                      style: TextStyle(color: AppColors.softGrey),
+                    ),
                   ),
                 )
               else
@@ -129,7 +141,7 @@ class TravelExpensesPage extends StatelessWidget {
                     child: ListTile(
                       leading: const Icon(
                         Icons.credit_card,
-                        color: Colors.blue,
+                        color: AppColors.tagBlue,
                       ),
                       title: Text(card.nome),
                       subtitle: Text(
@@ -145,7 +157,7 @@ class TravelExpensesPage extends StatelessWidget {
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
-                              color: Colors.green,
+                              color: AppColors.greenAccent,
                             ),
                           ),
                         ],
